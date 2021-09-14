@@ -6,23 +6,25 @@ import json
 class Recognizer:
 
 	def __init__(self):
-		self.spider = WebSpider()
+		
 
 		self.keywords_filepath = '../assets/key_words.json'
 
 		self.intents_and_funcs = {
 			
 			'show_schedule': 'self.spider.show_schedule()',
-			'show_info': None,
+			'show_info': 'self.spider.show_info()',
 			'show_curriculum': 'self.spider.show_curriculum()',
-			'show_weather': None
+			'show_weather': None,
+			'exit': 'self.spider.exit()'
 
 		}
 
 		self.intents_and_answers = {
 			'show_schedule': ['Показываю расписание на неделю...', 'Посмотрите расписание на завтра...',],
 			'show_curriculum': ['Показываю учебный план на год...', 'Вот учебный план на год..'],
-			'show_weather': ['Показываю погоду на день']
+			'show_weather': ['Показываю погоду на день'],
+			'exit': ['заканчиваю работу', 'выключаюсь']
 		}
 
 	
@@ -38,7 +40,8 @@ class Recognizer:
 	
 
 	def classify_intent(self, command):
-		
+		command = command.lower()
+
 		def unpack_keywords():
 			with open(self.keywords_filepath, encoding='utf-8') as json_file:
 				return json.loads(json_file.read())
@@ -57,15 +60,14 @@ class Recognizer:
 
 
 
-	def answer(self, command):
+	def get_command(self, command):
 
 		intent = self.classify_intent(command)
 
 		if intent in self.intents_and_funcs:
-			print(choice(self.intents_and_answers[intent]))
-			eval(self.intents_and_funcs[intent])
-
+			return intent
 		else:
-			print('Я вас не понимаю...')
+			return 'Error!'
 
+		
 

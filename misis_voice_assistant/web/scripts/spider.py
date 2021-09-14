@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import json 
+import sys
 
 
 
@@ -12,17 +13,17 @@ class WebSpider:
 	def __init__(self):
 
 		self.driver = webdriver.Chrome(ChromeDriverManager().install())
-		self.driver.implicitly_wait(30)
+		self.driver.close()
 		
 		self.autorization_url = 'https://login.misis.ru/user/users/sign_in'
 		self.logged_in_filepath = '../assets/passwords/logged_in.txt'
 		self.password_filepath = '../assets/passwords/curr_password.txt'
 		
-		self.file_is_empty_error_html = None
-		self.login_is_wrong_error_html = None
-		self.WrongLoginPasswordError_html = None
+		self.file_is_empty_error_html = '../assets/errors/file_is_empty.html'
+		self.WrongLoginPasswordError_html = '../assets/errors/wrong_login.html'
 
-	
+		self.logged_in = False
+
 	def get_user_data(self):
 
 		try:
@@ -74,14 +75,19 @@ class WebSpider:
 				print('[INFO] -> Succesfully logged in!')
 				self.logged_in = True
 				self.write_log_in()
+				
 			
 			else:
-				self.driver.get(WrongLoginPasswordError_html)
+				html_content = open(self.WrongLoginPasswordError_html).read()
+				self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
 
 		except ValueError:
-			self.driver.get(file_is_empty_error_html)
-			#print(self.password_filepath)
+			html_content = open(file_is_empty_error_html).read()
+			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+
+	
+
 
 	def show_schedule(self):
 
@@ -97,8 +103,9 @@ class WebSpider:
 			except Exception as e:
 				print(e)
 
-	def show_curriculum(self):
+		
 
+	def show_curriculum(self):
 		self.log_in()
 
 		if self.logged_in:
@@ -111,6 +118,36 @@ class WebSpider:
 				self.driver.get(curriculum_url)
 			except Exception as e:
 				print(e)
+
+		
+
+	def show_info(self):
+
+		self.log_in()
+
+		if self.logged_in:
+
+			info_url = 'https://misis.ru/sveden/education/eduOp/'
+
+			try:
+				self.driver.get(info_url)
+			except Exception as e:
+				print(e)
+
+		
+
+	def exit(self):
+
+		if self.logged_in:
+			self.logged_in = False
+
+			with open(self.logged_in_filepath, 'w') as logged_in_file:
+				logged_in_file.write('False')
+
+			with open(self.password_filepath, 'w') as password_file:
+				password_file.write('')
+
+			sys.exit()
 
 
 

@@ -1,7 +1,4 @@
-import json
+user_data_filepath = '../assets/passwords/curr_password.txt'
 
-with open("../assets/key_words.json", encoding='utf-8') as json_file:
-	keywords = json.loads(json_file.read())
-
-
-print(keywords)
+with open(user_data_filepath, 'r') as file:
+	print(file.readlines())

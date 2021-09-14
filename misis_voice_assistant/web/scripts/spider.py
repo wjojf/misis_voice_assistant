@@ -15,7 +15,7 @@ class WebSpider:
 		self.driver.implicitly_wait(30)
 		
 		self.autorization_url = 'https://login.misis.ru/user/users/sign_in'
-		self.logged_in = False
+		self.logged_in_filepath = '../assets/passwords/logged_in.txt'
 		self.password_filepath = '../assets/passwords/curr_password.txt'
 		
 		self.file_is_empty_error_html = None
@@ -30,6 +30,11 @@ class WebSpider:
 				return file.readline().split('|')
 		except:
 			return 'Error!'
+
+
+	def write_log_in(self):
+		with open(self.logged_in_filepath, 'w') as file:
+			file.write('True')
 
 
 	def log_in(self):
@@ -68,6 +73,7 @@ class WebSpider:
 			if curr_url.split('/')[-2] == 'services':
 				print('[INFO] -> Succesfully logged in!')
 				self.logged_in = True
+				self.write_log_in()
 			
 			else:
 				self.driver.get(WrongLoginPasswordError_html)

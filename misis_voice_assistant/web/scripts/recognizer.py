@@ -25,7 +25,18 @@ class Recognizer:
 			'show_weather': ['Показываю погоду на день']
 		}
 
-	#TODO:
+	
+	
+	def save_unknown_command(self, command):
+		
+		commands = json.loads(open(self.unknown_commands_filepath, encoding='utf-8').read())
+		commands["commands"].append(command)
+
+		with open(self.unknown_commands_filepath,'w', encoding='utf-8') as json_file:
+			json.dump(commands, json_file)
+
+	
+
 	def classify_intent(self, command):
 		
 		def unpack_keywords():
@@ -41,7 +52,10 @@ class Recognizer:
 					return intent
 
 		#TODO: classify intent if none of the keywords are present
-		return command
+		self.save_unknown_command(command)
+		return 'Error'
+
+
 
 	def answer(self, command):
 
@@ -55,6 +69,3 @@ class Recognizer:
 			print('Я вас не понимаю...')
 
 
-
-r = Recognizer()
-r.answer('покажи пожалуйста учебный план на год')

@@ -34,8 +34,8 @@ class VoiceAssistant:
 
 			user_command = self.sr.take_command()
 
-			if self.sr.is_valid(command)
-			self.handle_user_command(user_command)
+			if self.sr.is_valid(command):
+				self.handle_user_command(user_command)
 
 
 

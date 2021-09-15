@@ -1,68 +1,50 @@
 from log_in import LoginPage
 from spider import WebSpider
 from recognizer import Recognizer
+from speech_recognizer import SpeechRecognizer
 from time import sleep
 import sys
 
-class VoiceAssistantGUI:
 
+class VoiceAssistant:
 
 	def __init__(self):
-		self.logged_in_file = '../assets/passwords/logged_in.txt'
+		self.logged_in_file = '../assets/user_status/logged_in.txt'
 		self.recognizer = Recognizer()
 		self.login_page = LoginPage()
 		self.spider = WebSpider()
-
-
-	def is_logged_in(self):
-		with open(self.logged_in_file, 'r') as file:
-			return eval(file.readline())
-
-	def is_valid_command(self, command):
-		return command != 'Error!'
-
-	#TODO:
-	def run_gui(self):
-		pass
-
-
-	def start(self):
-		self.login_page._start()
-
-		#It stops working here without throwing any errors. 
-		#TODO: WHY??
-
-		print('Got user data!')
-		sleep(10)
-		
-		if self.is_logged_in():
-			
-			test_command = 'Покажи-ка расписание на завтра'
-
-			command = self.recognizer.get_command(test_command)
-
-			if self.is_valid_command(command):
-				eval(command)
-				sleep(2)
-
-			test_command = 'выйди'
-			command = self.recognizer.get_command(test_command)
-			
-			if self.is_valid_command(command):
-				eval(command)
-				sleep(2)
-
-		else: 
-			print('Не вошёл')
+		self.sr = SpeechRecognizer()
 
 	
+	def handle_user_command(self, user_command):
+
+		func = self.recognizer.get_func(user_command)
+
+		if func['func'] is not None:
+			self.sr.say(func['answer'])
+			eval(func['func'])
+
+			sleep(2)
+
+	def run(self):
+		print('[INFO] -> STARTING...')
+
+
+		while True:
+
+			user_command = self.sr.take_command()
+
+			if self.sr.is_valid(command)
+			self.handle_user_command(user_command)
+
+
+
 
 	def exit(self):
 		self.spider.exit()
-
-
+		sys.exit(1)
 
 
 if __name__ == '__main__':
-	v = VoiceAssistantGUI()
-	v.start()
+	v = VoiceAssistant()
+	v.run()

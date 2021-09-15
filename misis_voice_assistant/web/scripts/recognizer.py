@@ -7,26 +7,15 @@ class Recognizer:
 
 	def __init__(self):
 		
+		self.intents_and_keywords_filepath = '../assets/intents_json/intents_and_keywords.json'
+		self.intents_and_funcs_filepath = '../assets/intents_json/intents_and_funcs.json'
+		self.intents_and_answers_filepath = '../assets/intents_json/intents_and_answers.json'
 
-		self.keywords_filepath = '../assets/key_words.json'
-
-		self.intents_and_funcs = {
-			
-			'show_schedule': 'self.spider.show_schedule()',
-			'show_info': 'self.spider.show_info()',
-			'show_curriculum': 'self.spider.show_curriculum()',
-			'show_weather': None,
-			'exit': 'self.spider.exit()'
-
-		}
-
-		self.intents_and_answers = {
-			'show_schedule': ['Показываю расписание на неделю...', 'Посмотрите расписание на завтра...',],
-			'show_curriculum': ['Показываю учебный план на год...', 'Вот учебный план на год..'],
-			'show_weather': ['Показываю погоду на день'],
-			'exit': ['заканчиваю работу', 'выключаюсь']
-		}
-
+		self.intents_and_funcs = json.loads(open(self.intents_and_funcs_filepath).read())
+		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath).read())
+		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath).read())
+		
+		self.unknown_commands_filepath = '../assets./errors/unknown_commands.json'
 	
 	
 	def save_unknown_command(self, command):
@@ -38,36 +27,30 @@ class Recognizer:
 			json.dump(commands, json_file)
 
 	
-
 	def classify_intent(self, command):
 		command = command.lower()
 
-		def unpack_keywords():
-			with open(self.keywords_filepath, encoding='utf-8') as json_file:
-				return json.loads(json_file.read())
-
-		keywords = unpack_keywords()
-
 		#check for common words
-		for intent in keywords:
-			for keyword in keywords[intent]:
+		for intent in self.intents_and_keywords:
+			for keyword in self.intents_and_keywords[intent]:
 				if keyword in command:
 					return intent
 
+		
 		#TODO: classify intent if none of the keywords are present
 		self.save_unknown_command(command)
-		return 'Error'
+		return 'error'
 
 
-
-	def get_command(self, command):
+	def get_func(self, command):
+		print(f'Поступившая команда: {command}')
 
 		intent = self.classify_intent(command)
 
 		if intent in self.intents_and_funcs:
-			return intent
+			return {
+					 'func': self.intents_and_funcs[intent],
+					 'answer': choice(self.intents_and_answers[intent])
+					}
 		else:
-			return 'Error!'
-
-		
-
+			return {'func': None, 'answer': 'Я вас не понял...'}

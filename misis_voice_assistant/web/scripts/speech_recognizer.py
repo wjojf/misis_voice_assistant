@@ -10,6 +10,10 @@ class SpeechRecognizer:
 
 
 	def take_command(self):
+		'''
+		Take voice command using microphone or saying 'Error' 
+		:return: command: str
+		'''
 		try:
 			with sr.Microphone() as source:
 				print('[INFO] -> Listening...')
@@ -24,4 +28,5 @@ class SpeechRecognizer:
 		return command != 'ошибка!'
 
 	def say(self, command):
+		print('[ANSWER] {}'.format(command))
 		self.engine.say(command)

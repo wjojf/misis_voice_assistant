@@ -18,25 +18,51 @@ class VoiceAssistant:
 	
 	def handle_user_command(self, user_command):
 
-		func = self.recognizer.get_func(user_command)
+		'''
+		Execute function if command understood, otherwise say command is not understood
+		:param user_command: str
+		:return: None
+		'''
 
+		func = self.recognizer.get_func(user_command)
+		self.sr.say(func['answer'])
 		if func['func'] is not None:
-			self.sr.say(func['answer'])
+			
 			eval(func['func'])
 
 			sleep(2)
 
+
 	def run(self):
+		'''
+		Mainloop
+		While command != quit: take new command, classify it and execute if classified
+		:return: None
+		'''
+
 		print('[INFO] -> STARTING...')
 
 
 		while True:
 
-			user_command = self.sr.take_command()
+			user_input = input('[INPUT] -> Input action(/C:command, /Q: quit)').lower()
 
-			if self.sr.is_valid(command):
-				self.handle_user_command(user_command)
+			if user_input == '/c' or user_input == '/command':
+				
+				try:
+					user_command = self.sr.take_command()
+				except:
+					user_command = None
+				
+				if self.sr.is_valid(user_command):
+					
+					self.handle_user_command(user_command)
+					
+					sleep(2)
+			
 
+			elif user_input == '/q' or user_input == '/quit':
+				break
 
 
 

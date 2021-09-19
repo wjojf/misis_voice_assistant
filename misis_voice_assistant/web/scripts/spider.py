@@ -13,8 +13,8 @@ class WebSpider:
 	def __init__(self):
 
 		self.autorization_url = 'https://login.misis.ru/user/users/sign_in'
-		self.logged_in_filepath = '../assets/passwords/logged_in.txt'
-		self.password_filepath = '../assets/passwords/curr_password.txt'
+		self.logged_in_filepath = '../assets/user_status/logged_in.txt'
+		self.password_filepath = '../assets/user_status/curr_password.txt'
 		
 		self.file_is_empty_error_html = '../assets/errors/file_is_empty.html'
 		self.WrongLoginPasswordError_html = '../assets/errors/wrong_login.html'
@@ -22,6 +22,10 @@ class WebSpider:
 		self.logged_in = False
 
 	def get_user_data(self):
+		'''
+		Get user data from .txt file
+		:return: [login, password]
+		'''
 
 		try:
 			with open(self.password_filepath) as file:
@@ -32,6 +36,19 @@ class WebSpider:
 
 
 	def log_in(self):
+		'''
+		1)Write logged in status for user
+
+		2)Open WebDriver
+
+		3)Try to log in on site
+
+		4)If logged in change self.logged_in -> True
+				else handle all possible errors(wrong login, site not working, etc...)
+
+		:return:None
+		'''
+
 
 		def write_log_in():
 			with open(self.logged_in_filepath, 'w') as file:
@@ -85,21 +102,26 @@ class WebSpider:
 
 
 		except ValueError:
-			html_content = open(file_is_empty_error_html).read()
+			print(self.get_user_data())
+			html_content = open(self.file_is_empty_error_html).read()
 			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
 	
 
 
 	def show_schedule(self):
+		'''
+		Open schedule page on university website
+		:return: None
+		'''
 
 		if not self.logged_in:
 			self.log_in()
 			
 		if self.logged_in:
-			curr_url = self.driver.current_url.split('/')
-		#https://login.misis.ru/ru/s68987/services/index -> https://login.misis.ru/ru/s68987/schedule
-			schedule_url =  '/'.join(curr_url[:-2] + ['schedule'])
+			
+			#https://login.misis.ru/ru/s68987/services/index -> https://login.misis.ru/ru/s68987/schedule
+			schedule_url =  'https://login.misis.ru/ru/s68987/schedule'
 			try:
 				self.driver.get(schedule_url)
 				sleep(5)
@@ -109,15 +131,21 @@ class WebSpider:
 		
 
 	def show_curriculum(self):
-		
+		'''
+		Open curriculum page on university website
+		:return: None
+		'''
+
+
 		if not self.logged_in:
 			self.log_in()
 
 		
 		#https://login.misis.ru/ru/s68987/services/index -> https://login.misis.ru/ru/s68987/curriculum/index
 		if self.logged_in:
-			curr_url = self.driver.current_url.split('/')
-			curriculum_url = '/'.join(curr_url[:-2] + ['curriculum', 'index'])
+			
+			curriculum_url = 'https://login.misis.ru/ru/s68987/curriculum/index'
+			
 			try:
 				self.driver.get(curriculum_url)
 				sleep(5)
@@ -127,6 +155,11 @@ class WebSpider:
 		
 
 	def show_info(self):
+		'''
+		Open info page on university website
+		:return: None
+		'''
+
 
 		if not self.logged_in:
 			self.log_in()
@@ -144,6 +177,11 @@ class WebSpider:
 
 	def exit(self):
 
+		'''
+		Close WebDriver, write user status
+		:return:
+		'''
+
 		if self.logged_in:
 			self.logged_in = False
 
@@ -153,7 +191,7 @@ class WebSpider:
 			with open(self.password_filepath, 'w') as password_file:
 				password_file.write('')
 
-			sleep(5)
+			sleep(1)
 
 			self.driver.close()
 

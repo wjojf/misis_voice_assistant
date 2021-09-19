@@ -11,14 +11,19 @@ class Recognizer:
 		self.intents_and_funcs_filepath = '../assets/intents_json/intents_and_funcs.json'
 		self.intents_and_answers_filepath = '../assets/intents_json/intents_and_answers.json'
 
-		self.intents_and_funcs = json.loads(open(self.intents_and_funcs_filepath).read())
-		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath).read())
-		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath).read())
+		self.intents_and_funcs = json.loads(open(self.intents_and_funcs_filepath,encoding='utf-8').read())
+		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath,encoding='utf-8').read())
+		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath,encoding='utf-8').read())
 		
 		self.unknown_commands_filepath = '../assets./errors/unknown_commands.json'
 	
 	
 	def save_unknown_command(self, command):
+		'''
+		Write unknown command to json file
+		:param command: str
+		:return:  None
+		'''
 		
 		commands = json.loads(open(self.unknown_commands_filepath, encoding='utf-8').read())
 		commands["commands"].append(command)
@@ -28,9 +33,13 @@ class Recognizer:
 
 	
 	def classify_intent(self, command):
-		command = command.lower()
+		'''
+		Classify intent (for example: 'show_schedule')
+		:param command: str
+		:return: intent: str
+		'''
 
-		#check for common words
+		command = command.lower()
 		for intent in self.intents_and_keywords:
 			for keyword in self.intents_and_keywords[intent]:
 				if keyword in command:
@@ -43,6 +52,13 @@ class Recognizer:
 
 
 	def get_func(self, command):
+		'''
+		Classify intent and get function by intent
+		:param command:
+		:return: None
+		'''
+
+
 		print(f'Поступившая команда: {command}')
 
 		intent = self.classify_intent(command)
@@ -54,3 +70,5 @@ class Recognizer:
 					}
 		else:
 			return {'func': None, 'answer': 'Я вас не понял...'}
+
+

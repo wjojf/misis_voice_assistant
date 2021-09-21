@@ -48,18 +48,23 @@ class VoiceAssistant:
 			user_input = input('[INPUT] -> Input action(/C:command, /Q: quit)').lower()
 
 			if user_input == '/c' or user_input == '/command':
+				input_type = input('Voice/Keyboard: [/v, /k]').lower()
 				
-				try:
-					user_command = self.sr.take_command()
-				except:
-					user_command = None
+				if input_type == '/v':
+					try:
+						user_command = self.sr.take_command()
+					except:
+						user_command = None
 				
-				if self.sr.is_valid(user_command):
+					if self.sr.is_valid(user_command):
 					
-					self.handle_user_command(user_command)
+						self.handle_user_command(user_command)
 					
-					sleep(2)
-			
+						sleep(2)
+				
+				elif input_type == '/k':
+					command = input('[KEYBOARD_INPUT] -> Введите команду: ')
+					self.handle_user_command(command)
 
 			elif user_input == '/q' or user_input == '/quit':
 				break

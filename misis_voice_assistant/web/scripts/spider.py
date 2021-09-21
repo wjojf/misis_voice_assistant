@@ -19,6 +19,9 @@ class WebSpider:
 		self.file_is_empty_error_html = '../assets/errors/file_is_empty.html'
 		self.WrongLoginPasswordError_html = '../assets/errors/wrong_login.html'
 
+		#URLS
+		self.LMS_URL = 'https://lms.misis.ru/'
+
 		self.logged_in = False
 
 	def get_user_data(self):
@@ -173,7 +176,49 @@ class WebSpider:
 			except Exception as e:
 				print(e)
 
+	def authorize_lms(self):
+		try:
+			email, password = self.get_user_data()
 		
+		except ValueError:
+			print('[ERROR] -> user data: ', self.get_user_data())
+			html_content = open(self.file_is_empty_error_html).read()
+			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+
+			return
+
+		try:
+			login_element = self.driver.find_element_by_id("pseudonym_session_unique_id")
+			password_element = self.driver.find_element_by_id("pseudonym_session_password")
+			button_element = self.driver.find_elements_by_class_name("Button Button--login")
+			
+			login_element.send_keys(email)
+			password_element.send_keys(password)
+			button_element.click()
+
+		except:
+			print('[ERROR] Cannot find elements on page')
+
+
+	def open_lms(self):
+
+		if not(self.logged_in):
+			self.log_in()
+
+		
+		#//TODO: AUTHORIZE ON LMS
+		if self.logged_in:
+			self.driver.get(self.LMS_URL)
+
+			try:
+				self.authorize_lms()
+
+			except Exception as e:
+				print(e)
+
+
+
+
 
 	def exit(self):
 

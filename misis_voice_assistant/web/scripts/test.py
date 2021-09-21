@@ -48,3 +48,14 @@ def callback(recognizer, audio):
     except sr.RequestError as e:
         print("[log] Неизвестная ошибка, проверьте интернет!")
  
+
+
+
+
+'''
+<input class="ic-Input text" autofocus="autofocus" type="text" name="pseudonym_session[unique_id]" id="pseudonym_session_unique_id">
+<input class="ic-Input text" type="password" name="pseudonym_session[password]" id="pseudonym_session_password">
+<button type="submit" class="Button Button--login">
+                  Войти
+                </button>
+'''

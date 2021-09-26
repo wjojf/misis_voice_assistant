@@ -1,0 +1,10 @@
+{
+	"show_schedule": "self.spider.show_schedule()",
+	"show_info": "self.spider.show_info()",
+	"show_curriculum": "self.spider.show_curriculum()",
+	"show_weather": "self.spider.show_weather()",
+	"show_wifi_info": "self.spider.show_wifi_info()",
+	"show_services": "self.spider.show_services()",
+	"exit": "self.spider.exit()",
+	"open_lms": "self.spider.open_lms()"
+}

@@ -11,9 +11,9 @@ class Recognizer:
 		self.intents_and_funcs_filepath = '../assets/intents_json/intents_and_funcs.json'
 		self.intents_and_answers_filepath = '../assets/intents_json/intents_and_answers.json'
 
-		self.intents_and_funcs = json.loads(open(self.intents_and_funcs_filepath,encoding='utf-8').read())
-		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath,encoding='utf-8').read())
-		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath,encoding='utf-8').read())
+		self.intents_and_funcs = json.loads(open(self.intents_and_funcs_filepath, encoding='utf-8').read())
+		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath, encoding='utf-8').read())
+		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath, encoding='utf-8').read())
 		
 		self.unknown_commands_filepath = '../assets./errors/unknown_commands.json'
 	
@@ -28,7 +28,7 @@ class Recognizer:
 		commands = json.loads(open(self.unknown_commands_filepath, encoding='utf-8').read())
 		commands["commands"].append(command)
 
-		with open(self.unknown_commands_filepath,'w', encoding='utf-8') as json_file:
+		with open(self.unknown_commands_filepath, 'w', encoding='utf-8') as json_file:
 			json.dump(commands, json_file)
 
 	
@@ -47,6 +47,8 @@ class Recognizer:
 
 		
 		#TODO: classify intent if none of the keywords are present
+
+		
 		self.save_unknown_command(command)
 		return 'error'
 

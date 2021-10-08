@@ -1,33 +1,38 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
-import json 
-import sys
-
 
 
 class WebSpider:
 
-
 	def __init__(self):
 
-		self.autorization_url = 'https://login.misis.ru/user/users/sign_in'
+		# AUTHORIZATION FILES
 		self.logged_in_filepath = '../assets/user_status/logged_in.txt'
 		self.password_filepath = '../assets/user_status/curr_password.txt'
 		
+		# ERROR HTML
 		self.file_is_empty_error_html = '../assets/errors/file_is_empty.html'
 		self.WrongLoginPasswordError_html = '../assets/errors/wrong_login.html'
 
-		#URLS
-		self.LMS_URL = 'https://lms.misis.ru/'
+		# URLS
+		self.authorization_url = 'https://login.misis.ru/user/users/sign_in'
+		self.LMS_URL = 'https://lms.misis.ru/login/ldap'
+		self.WEATHER_URL = 'https://www.gismeteo.ru/'
+		self.INFO_URL = 'https://misis.ru/sveden/education/eduOp/'
+		self.CURRICULUM_URL = 'https://login.misis.ru/ru/s68987/curriculum/index'
+		self.SCHEDULE_URL =  'https://login.misis.ru/ru/s68987/schedule'
+		self.RECORDBOOK_URL = 'https://login.misis.ru/ru/s68987/stud-book?type=mark'
 		self.WIFI_INFO_URL = 'https://login.misis.ru/ru/s68987/wifis'
 		self.SERVICES_URL = 'https://login.misis.ru/ru/s68987/rqsvc_requests'
-
-		#boolean
+		
+		# USER STATUS
 		self.logged_in = False
+		self.save_password = False
+		self.delete_password = True
 
 	def get_user_data(self):
+
 		'''
 		Get user data from .txt file
 		:return: [login, password]
@@ -39,7 +44,31 @@ class WebSpider:
 		except:
 			return 'Error!'
 
+	def ask_save_password(self):
+		'''
+		Change status for saving password after exit
+		:return: None
+		'''
 
+
+		user_answer = input('[INPUT] -> Save password?(y/n): ')
+
+		if user_answer.lower() in ['yes', 'y']:
+			self.save_password = True
+			self.delete_password = False
+
+
+
+			return
+
+		elif user_answer.lower() in ['no', 'n']:
+			self.save_password = False
+			self.delete_password = True
+			return
+
+		else:
+			print('[ERROR] -> Command not recognized')
+			self.ask_save_password()
 
 	def log_in(self):
 		'''
@@ -57,8 +86,10 @@ class WebSpider:
 
 
 		def write_log_in():
-			with open(self.logged_in_filepath, 'w') as file:
+			with open(self.logged_in_filepath, 'w', encoding='utf-8') as file:
 				file.write('True')
+
+
 
 		
 		self.driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -69,14 +100,14 @@ class WebSpider:
 			login, password = self.get_user_data()
 
 		
-			self.driver.get(self.autorization_url)
+			self.driver.get(self.authorization_url)
 		
 			try:
 				login_element = self.driver.find_element_by_id('user_login')
 				login_element.send_keys(login)
 			
 			except:
-				print('Cannot find login element on page:(')
+				print('[ERROR] -> Cannot find login element on page:(')
 				return
 
 			try:
@@ -84,7 +115,7 @@ class WebSpider:
 				password_element.send_keys(password)
 			
 			except:
-				print('Cannot find password element on page:(')
+				print('[ERROR] -> Cannot find password element on page:(')
 				return 
 			
 			try:
@@ -92,15 +123,17 @@ class WebSpider:
 				button_element.click()
 			
 			except:
-				print('Cannot find button on page:(')
+				print('[ERROR] -> Cannot find button on page:(')
 				return 
 		
 			curr_url = self.driver.current_url
 
+			#IF LOGGED IN
 			if curr_url.split('/')[-2] == 'services':
-				print('[INFO] -> Succesfully logged in!')
+				print('[SELENIUM INFO] -> Succesfully logged in!')
 				self.logged_in = True
 				write_log_in()
+
 					
 			else:
 				html_content = open(self.WrongLoginPasswordError_html).read()
@@ -108,7 +141,7 @@ class WebSpider:
 
 
 		except ValueError:
-			print(self.get_user_data())
+			print('[ERROR] User not authorized ->', self.get_user_data())
 			html_content = open(self.file_is_empty_error_html).read()
 			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
@@ -125,11 +158,9 @@ class WebSpider:
 			self.log_in()
 			
 		if self.logged_in:
-			
 			#https://login.misis.ru/ru/s68987/services/index -> https://login.misis.ru/ru/s68987/schedule
-			schedule_url =  'https://login.misis.ru/ru/s68987/schedule'
 			try:
-				self.driver.get(schedule_url)
+				self.driver.get(self.SCHEDULE_URL)
 				sleep(5)
 			except Exception as e:
 				print(e)
@@ -149,11 +180,8 @@ class WebSpider:
 		
 		#https://login.misis.ru/ru/s68987/services/index -> https://login.misis.ru/ru/s68987/curriculum/index
 		if self.logged_in:
-			
-			curriculum_url = 'https://login.misis.ru/ru/s68987/curriculum/index'
-			
 			try:
-				self.driver.get(curriculum_url)
+				self.driver.get(self.CURRICULUM_URL)
 				sleep(5)
 			except Exception as e:
 				print(e)
@@ -172,9 +200,9 @@ class WebSpider:
 		
 
 		if self.logged_in:
-			info_url = 'https://misis.ru/sveden/education/eduOp/'
+
 			try:
-				self.driver.get(info_url)
+				self.driver.get(self.INFO_URL)
 				sleep(5)
 			except Exception as e:
 				print(e)
@@ -184,7 +212,7 @@ class WebSpider:
 			email, password = self.get_user_data()
 		
 		except ValueError:
-			print('[ERROR] -> user data: ', self.get_user_data())
+			print('[SELENIUM ERROR] -> user data: ', self.get_user_data())
 			html_content = open(self.file_is_empty_error_html).read()
 			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
@@ -193,14 +221,14 @@ class WebSpider:
 		try:
 			login_element = self.driver.find_element_by_id("pseudonym_session_unique_id")
 			password_element = self.driver.find_element_by_id("pseudonym_session_password")
-			button_element = self.driver.find_element_by_css_selector('login_form > div.ic-Login__actions > div.ic-Form-control.ic-Form-control--login > button')
+			button_element = self.driver.find_element_by_css_selector("#login_form > div.ic-Login__actions > div.ic-Form-control.ic-Form-control--login > button")
 			
 			login_element.send_keys(email)
 			password_element.send_keys(password)
 			button_element.click()
 
 		except:
-			print('[ERROR] Cannot find elements on page')
+			print('[SELENIUM ERROR] -> Cannot find elements on page')
 
 
 	def open_lms(self):
@@ -208,7 +236,6 @@ class WebSpider:
 		if not(self.logged_in):
 			self.log_in()
 
-		
 
 		if self.logged_in:
 			self.driver.get(self.LMS_URL)
@@ -220,6 +247,27 @@ class WebSpider:
 				print(e)
 
 
+	def open_recordbook(self):
+		if not self.logged_in:
+			self.log_in()
+
+		if self.logged_in:
+			try:
+				self.driver.get(self.RECORDBOOK_URL)
+			except:
+				print('[SELENIUM ERROR] -> CANNOT OPEN RECORDBOOK')
+
+	def show_weather(self):
+
+		if not self.logged_in:
+			self.log_in()
+
+		if self.logged_in:
+			try:
+				self.driver.get(self.WEATHER_URL)
+			except:
+				print('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
+
 	def show_wifi_info(self):
 
 		if not self.logged_in:
@@ -228,10 +276,8 @@ class WebSpider:
 		if self.logged_in:
 			try:
 				self.driver.get(self.WIFI_INFO_URL)
-
 			except Exception as e:
-				print(e)
-
+				print(f'[ERROR] -> {e}')
 
 	def show_services(self):
 
@@ -241,10 +287,8 @@ class WebSpider:
 		if self.logged_in:
 			try:
 				self.driver.get(self.SERVICES_URL)
-			except Exception as  e:
-				print(e)
-
-
+			except Exception as e:
+				print(f'[ERROR] -> {e}')
 
 
 	def exit(self):
@@ -255,17 +299,26 @@ class WebSpider:
 		'''
 
 		if self.logged_in:
+
+			self.ask_save_password()
+
 			self.logged_in = False
 
-			with open(self.logged_in_filepath, 'w') as logged_in_file:
-				logged_in_file.write('False')
 
-			with open(self.password_filepath, 'w') as password_file:
-				password_file.write('')
+			if self.delete_password:
 
-			sleep(1)
+				with open(self.logged_in_filepath, 'w') as logged_in_file:
+					logged_in_file.write('False')
 
-			self.driver.close()
+				with open(self.password_filepath, 'w') as password_file:
+					password_file.write('')
+
+
+			try:
+				self.driver.close()
+			except:
+				pass
+
 
 
 

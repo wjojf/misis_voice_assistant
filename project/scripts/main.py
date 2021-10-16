@@ -4,6 +4,7 @@ from speech_recognizer import SpeechRecognizer
 from admin import AdminPanel
 from time import sleep
 from colorama import init, Fore, Back, Style
+from bs4 import BeautifulSoup as bs
 import sys
 
 init(autoreset=True)

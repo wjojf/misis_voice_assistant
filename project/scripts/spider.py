@@ -17,7 +17,7 @@ class WebSpider:
 
 		# URLS
 		self.authorization_url = 'https://login.misis.ru/user/users/sign_in'
-		self.LMS_URL = 'https://lms.misis.ru/login/ldap'
+		self.LMS_URL = 'https://lms.misis.ru'
 		self.WEATHER_URL = 'https://www.gismeteo.ru/'
 		self.INFO_URL = 'https://misis.ru/sveden/education/eduOp/'
 		self.CURRICULUM_URL = 'https://login.misis.ru/ru/s68987/curriculum/index'
@@ -245,6 +245,42 @@ class WebSpider:
 
 			except Exception as e:
 				print(e)
+
+
+	def show_courses_lms(self):
+
+		if self.driver:
+
+			if self.LMS_URL in self.driver.current_url:
+				courses = self.driver.find_elements_by_class_name('ic-DashboardCard')
+				for n, course in enumerate(courses):
+					print(f'{n + 1})', course.get_attribute("aria-label"))
+					print()
+			else:
+				print('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
+				print(self.driver.current_url)
+
+
+	# TODO:
+	def open_course_lms(self):
+
+		if self.driver:
+			print('[ANSWER] -> Вот все курсы: ')
+
+			self.show_courses_lms()
+
+			course_index = int(input('Введите номер курса: '))
+
+			courses = self.driver.find_elements_by_class_name('ic-DashboardCard')
+
+			try:
+				print(f'[ANSWER] -> Отрываю курс {course_index}')
+				courses[course_index - 1].click()
+
+			except IndexError:
+				print(f'[ERROR] -> нет курса с номером {course_index}')
+
+
 
 
 	def open_recordbook(self):

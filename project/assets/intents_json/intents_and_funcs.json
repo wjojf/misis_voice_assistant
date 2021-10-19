@@ -9,5 +9,6 @@
 	"show_courses_lms": "self.spider.show_courses_lms()",
 	"open_course_lms": "self.spider.open_course_lms()",
 	"show_wifi_info": "self.spider.show_wifi_info()",
+	"show_student_id_info": "self.spider.show_student_id_info()",
 	"exit": "self.spider.exit()"
 }

@@ -10,10 +10,6 @@ class WebSpider:
 		# AUTHORIZATION FILES
 		self.logged_in_filepath = '../assets/user_status/logged_in.txt'
 		self.password_filepath = '../assets/user_status/curr_password.txt'
-		
-		# ERROR HTML
-		self.file_is_empty_error_html = '../assets/errors/file_is_empty.html'
-		self.WrongLoginPasswordError_html = '../assets/errors/wrong_login.html'
 
 		# URLS
 		self.authorization_url = 'https://login.misis.ru/user/users/sign_in'
@@ -25,11 +21,21 @@ class WebSpider:
 		self.RECORDBOOK_URL = 'https://login.misis.ru/ru/s68987/stud-book?type=mark'
 		self.WIFI_INFO_URL = 'https://login.misis.ru/ru/s68987/wifis'
 		self.SERVICES_URL = 'https://login.misis.ru/ru/s68987/rqsvc_requests'
+		self.STUDENT_CARD_INFO_URL = 'https://login.misis.ru/ru/s68987/stud_registry'
 		
 		# USER STATUS
 		self.logged_in = False
 		self.save_password = False
 		self.delete_password = True
+
+
+	def show_error_html(self, error_message):
+
+		if self.driver:
+			html_content = f'<html>{error_message}</html>'
+			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+
+
 
 	def get_user_data(self):
 
@@ -142,8 +148,7 @@ class WebSpider:
 
 		except ValueError:
 			print('[ERROR] User not authorized ->', self.get_user_data())
-			html_content = open(self.file_is_empty_error_html).read()
-			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+			self.show_error_html('Cannot get user data:(')
 
 	
 
@@ -163,7 +168,7 @@ class WebSpider:
 				self.driver.get(self.SCHEDULE_URL)
 				sleep(5)
 			except Exception as e:
-				print(e)
+				self.show_error_html(str(e))
 
 		
 
@@ -184,7 +189,7 @@ class WebSpider:
 				self.driver.get(self.CURRICULUM_URL)
 				sleep(5)
 			except Exception as e:
-				print(e)
+				self.show_error_html(str(e))
 		
 		
 
@@ -205,7 +210,7 @@ class WebSpider:
 				self.driver.get(self.INFO_URL)
 				sleep(5)
 			except Exception as e:
-				print(e)
+				self.show_error_html(str(e))
 
 	def authorize_lms(self):
 		try:
@@ -213,8 +218,7 @@ class WebSpider:
 		
 		except ValueError:
 			print('[SELENIUM ERROR] -> user data: ', self.get_user_data())
-			html_content = open(self.file_is_empty_error_html).read()
-			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+			self.show_error_html('Cannot get user data:(')
 
 			return
 
@@ -229,11 +233,11 @@ class WebSpider:
 
 		except:
 			print('[SELENIUM ERROR] -> Cannot find elements on page')
-
+			self.show_error_html('[SELENIUM ERROR] -> Cannot find elements on page')
 
 	def open_lms(self):
 
-		if not(self.logged_in):
+		if not self.logged_in:
 			self.log_in()
 
 
@@ -244,7 +248,7 @@ class WebSpider:
 				self.authorize_lms()
 
 			except Exception as e:
-				print(e)
+				self.show_error_html(str(e))
 
 
 	def show_courses_lms(self):
@@ -258,7 +262,7 @@ class WebSpider:
 					print()
 			else:
 				print('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
-				print(self.driver.current_url)
+				self.show_error_html('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
 
 
 	# TODO:
@@ -279,7 +283,7 @@ class WebSpider:
 
 			except IndexError:
 				print(f'[ERROR] -> нет курса с номером {course_index}')
-
+				self.show_error_html(f'[ERROR] -> нет курса с номером {course_index}')
 
 
 
@@ -291,7 +295,8 @@ class WebSpider:
 			try:
 				self.driver.get(self.RECORDBOOK_URL)
 			except:
-				print('[SELENIUM ERROR] -> CANNOT OPEN RECORDBOOK')
+				print('[SELENIUM ERROR] -> Cannot open recordbook')
+				self.show_error_html('[SELENIUM ERROR] -> Cannot open recordbook')
 
 	def show_weather(self):
 
@@ -303,6 +308,7 @@ class WebSpider:
 				self.driver.get(self.WEATHER_URL)
 			except:
 				print('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
+				self.show_error_html('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
 
 	def show_wifi_info(self):
 
@@ -314,6 +320,7 @@ class WebSpider:
 				self.driver.get(self.WIFI_INFO_URL)
 			except Exception as e:
 				print(f'[ERROR] -> {e}')
+				self.show_error_html(str(e))
 
 	def show_services(self):
 
@@ -325,7 +332,18 @@ class WebSpider:
 				self.driver.get(self.SERVICES_URL)
 			except Exception as e:
 				print(f'[ERROR] -> {e}')
+				self.show_error_html(str(e))
 
+	def show_student_id_info(self):
+		if not self.logged_in:
+			self.log_in()
+
+		if self.logged_in:
+			try:
+				self.driver.get(self.STUDENT_CARD_INFO_URL)
+			except Exception as e:
+				print(f'[ERROR] -> {e}')
+				self.show_error_html(str(e))
 
 	def exit(self):
 

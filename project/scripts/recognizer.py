@@ -40,6 +40,13 @@ class Recognizer:
 		'''
 
 		command = command.lower()
+
+		for question in self.intents_and_keywords["questions_about"]:
+			for keyword in self.intents_and_keywords["questions_about"][question]:
+				if keyword in command:
+					return ["questions_about", question]
+
+
 		for intent in self.intents_and_keywords:
 			for keyword in self.intents_and_keywords[intent]:
 				if keyword in command:
@@ -65,7 +72,13 @@ class Recognizer:
 
 		intent = self.classify_intent(command)
 
-		if intent in self.intents_and_funcs:
+		if isinstance(intent, list):
+			return {
+				'func': self.intents_and_funcs[intent[0]],
+				'answer': choice(self.intents_and_answers[intent[0]][intent[1]])
+			}
+
+		elif intent in self.intents_and_funcs:
 			return {
 					 'func': self.intents_and_funcs[intent],
 					 'answer': choice(self.intents_and_answers[intent])

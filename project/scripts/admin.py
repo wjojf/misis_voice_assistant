@@ -57,7 +57,7 @@ class AdminPanel:
 			print(f'[INFO] -> Successfully added {keyword} to {intent}')
 
 
-	def add_answer(self, ):
+	def add_answer(self):
 		answers_filepath = self.INTENTS_FILEPATH + '/intents_and_answers.json'
 
 		intent = input(Fore.RED + '[ADMIN INPUT] Enter intent ->')

@@ -6,6 +6,10 @@ from time import sleep
 class WebSpider:
 
 	def __init__(self):
+		self.driver = None
+
+		# HTMLS
+		self.ASSISTANT_INFO_HTML = '../assets/html/AssistantInfo.html'
 
 		# AUTHORIZATION FILES
 		self.logged_in_filepath = '../assets/user_status/logged_in.txt'
@@ -30,12 +34,37 @@ class WebSpider:
 
 
 	def show_error_html(self, error_message):
-
+		'''
+		Opens a page with local html error message
+		:param error_message:
+		:return:
+		'''
 		if self.driver:
 			html_content = f'<html>{error_message}</html>'
 			self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
+		else:
+			self.driver = webdriver.Chrome(ChromeDriverManager().install())
+			self.show_error_html(error_message)
 
+	def show_assistant_info(self):
+		'''
+
+		:return: None
+		'''
+
+		if self.driver:
+
+			try:
+				html_content = open(self.ASSISTANT_INFO_HTML, encoding='utf-8').read()
+				self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+
+			except Exception as e:
+				self.show_error_html(str(e))
+
+		else:
+			self.driver = webdriver.Chrome(ChromeDriverManager().install())
+			self.show_assistant_info()
 
 	def get_user_data(self):
 
@@ -213,6 +242,10 @@ class WebSpider:
 				self.show_error_html(str(e))
 
 	def authorize_lms(self):
+		'''
+		authorize on lms.misis.ru -> opens home courses page
+		:return:
+		'''
 		try:
 			email, password = self.get_user_data()
 		
@@ -236,7 +269,10 @@ class WebSpider:
 			self.show_error_html('[SELENIUM ERROR] -> Cannot find elements on page')
 
 	def open_lms(self):
-
+		'''
+		Open lms.misis.ru and authorizes
+		:return: None
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -252,7 +288,10 @@ class WebSpider:
 
 
 	def show_courses_lms(self):
-
+		'''
+		Prints list of courses on canvas
+		:return: None
+		'''
 		if self.driver:
 
 			if self.LMS_URL in self.driver.current_url:
@@ -267,7 +306,10 @@ class WebSpider:
 
 	# TODO:
 	def open_course_lms(self):
-
+		'''
+		Prints list of courses and clicks on/opens chosen
+		:return: None
+		'''
 		if self.driver:
 			print('[ANSWER] -> Вот все курсы: ')
 
@@ -288,6 +330,10 @@ class WebSpider:
 
 
 	def open_recordbook(self):
+		'''
+		Open online recordbook
+		:return:
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -299,7 +345,10 @@ class WebSpider:
 				self.show_error_html('[SELENIUM ERROR] -> Cannot open recordbook')
 
 	def show_weather(self):
-
+		'''
+		Opens a weather forecast site
+		:return:
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -311,7 +360,10 @@ class WebSpider:
 				self.show_error_html('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
 
 	def show_wifi_info(self):
-
+		'''
+		Opens wi-fi info page on misis website
+		:return:
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -323,7 +375,10 @@ class WebSpider:
 				self.show_error_html(str(e))
 
 	def show_services(self):
-
+		'''
+		Opens services page on misis website
+		:return:
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -335,6 +390,10 @@ class WebSpider:
 				self.show_error_html(str(e))
 
 	def show_student_id_info(self):
+		'''
+		Opens studentID card page
+		:return:
+		'''
 		if not self.logged_in:
 			self.log_in()
 
@@ -351,10 +410,9 @@ class WebSpider:
 		Close WebDriver, write user status
 		:return:
 		'''
+		self.ask_save_password()
 
 		if self.logged_in:
-
-			self.ask_save_password()
 
 			self.logged_in = False
 
@@ -368,10 +426,10 @@ class WebSpider:
 					password_file.write('')
 
 
-			try:
-				self.driver.close()
-			except:
-				pass
+		try:
+			self.driver.close()
+		except:
+			pass
 
 
 

@@ -7,6 +7,7 @@ class WebSpider:
 
 	def __init__(self):
 		self.driver = None
+		self.info_page_driver = None
 
 		# HTMLS
 		self.ASSISTANT_INFO_HTML = '../assets/html/AssistantInfo.html'
@@ -53,17 +54,20 @@ class WebSpider:
 		:return: None
 		'''
 
-		if self.driver:
+		if self.info_page_driver:
 
 			try:
 				html_content = open(self.ASSISTANT_INFO_HTML, encoding='utf-8').read()
-				self.driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
+				self.info_page_driver.get("data:text/html;charset=utf-8,{html_content}".format(html_content=html_content))
 
 			except Exception as e:
 				self.show_error_html(str(e))
-
+			
+			sleep(10)
+			self.info_page_driver.quit()
+		
 		else:
-			self.driver = webdriver.Chrome(ChromeDriverManager().install())
+			self.info_page_driver = webdriver.Chrome(ChromeDriverManager().install())
 			self.show_assistant_info()
 
 	def get_user_data(self):
@@ -327,6 +331,9 @@ class WebSpider:
 				print(f'[ERROR] -> нет курса с номером {course_index}')
 				self.show_error_html(f'[ERROR] -> нет курса с номером {course_index}')
 
+	# TODO:
+	def open_homework_lms(self):
+		pass
 
 
 	def open_recordbook(self):

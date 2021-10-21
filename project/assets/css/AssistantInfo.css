@@ -1,0 +1,12 @@
+body{
+    margin: 0;
+    background-color: bisque;
+    padding: 25%;
+};
+
+.container{
+    justify-self: start;
+    justify-content: center;
+    border-radius: 5px;
+    background-color: aqua;
+}

@@ -98,7 +98,7 @@ class VoiceAssistant:
 						sleep(2)
 				
 				elif input_type == '/k':
-					command = input('[KEYBOARD_INPUT] -> Введите команду: ')
+					command = input(Fore.GREEN + '[KEYBOARD_INPUT] -> Введите команду: ')
 					self.handle_user_command(command)
 
 
@@ -109,7 +109,7 @@ class VoiceAssistant:
 
 						self.admin_panel.list()
 
-						admin_command = input('[ADMIN] Enter command -> ')
+						admin_command = input( Fore.RED + '[ADMIN] Enter command -> ')
 
 						if admin_command in self.admin_panel.commands_list:
 

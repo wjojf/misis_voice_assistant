@@ -8,7 +8,7 @@
 	"show_recordbook": "self.spider.open_recordbook()",
 	"show_courses_lms": "self.spider.show_courses_lms()",
 	"open_course_lms": "self.spider.open_course_lms()",
-	"show_homework_lms": "self.spider.show_homework_lms()",
+	"open_homework_lms": "self.spider.open_homework_lms()",
 	"show_wifi_info": "self.spider.show_wifi_info()",
 	"show_student_id_info": "self.spider.show_student_id_info()",
 	"questions_about": "self.spider.show_assistant_info()",

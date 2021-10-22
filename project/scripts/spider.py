@@ -1,7 +1,7 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
-
+from colorama import init, Fore, Back, Style
 
 class WebSpider:
 
@@ -19,6 +19,7 @@ class WebSpider:
 		# URLS
 		self.authorization_url = 'https://login.misis.ru/user/users/sign_in'
 		self.LMS_URL = 'https://lms.misis.ru'
+		self.LMS_COURSE_URL = self.LMS_URL + '/courses/'
 		self.WEATHER_URL = 'https://www.gismeteo.ru/'
 		self.INFO_URL = 'https://misis.ru/sveden/education/eduOp/'
 		self.CURRICULUM_URL = 'https://login.misis.ru/ru/s68987/curriculum/index'
@@ -33,6 +34,9 @@ class WebSpider:
 		self.save_password = False
 		self.delete_password = True
 
+
+	def _print(self, message):
+		print(Fore.YELLOW + message)
 
 	def show_error_html(self, error_message):
 		'''
@@ -106,7 +110,7 @@ class WebSpider:
 			return
 
 		else:
-			print('[ERROR] -> Command not recognized')
+			self._print('[ERROR] -> Command not recognized')
 			self.ask_save_password()
 
 	def log_in(self):
@@ -146,7 +150,7 @@ class WebSpider:
 				login_element.send_keys(login)
 			
 			except:
-				print('[ERROR] -> Cannot find login element on page:(')
+				self._print('[ERROR] -> Cannot find login element on page:(')
 				return
 
 			try:
@@ -154,7 +158,7 @@ class WebSpider:
 				password_element.send_keys(password)
 			
 			except:
-				print('[ERROR] -> Cannot find password element on page:(')
+				self._print('[ERROR] -> Не могу найти поле для ввода пароля:(')
 				return 
 			
 			try:
@@ -162,14 +166,14 @@ class WebSpider:
 				button_element.click()
 			
 			except:
-				print('[ERROR] -> Cannot find button on page:(')
+				self._print('[ERROR] -> Не могу найти кнопку ввода:(')
 				return 
 		
 			curr_url = self.driver.current_url
 
 			#IF LOGGED IN
 			if curr_url.split('/')[-2] == 'services':
-				print('[SELENIUM INFO] -> Succesfully logged in!')
+				self._print('[SELENIUM INFO] -> Успешно выполнен вход!')
 				self.logged_in = True
 				write_log_in()
 
@@ -180,8 +184,8 @@ class WebSpider:
 
 
 		except ValueError:
-			print('[ERROR] User not authorized ->', self.get_user_data())
-			self.show_error_html('Cannot get user data:(')
+			self._print('[ERROR] Не смог найти данные пользователя ->', self.get_user_data())
+			self.show_error_html('Не смог найти данные пользователя:(')
 
 	
 
@@ -254,7 +258,7 @@ class WebSpider:
 			email, password = self.get_user_data()
 		
 		except ValueError:
-			print('[SELENIUM ERROR] -> user data: ', self.get_user_data())
+			self._print('[SELENIUM ERROR] -> user data: ', self.get_user_data())
 			self.show_error_html('Cannot get user data:(')
 
 			return
@@ -269,7 +273,7 @@ class WebSpider:
 			button_element.click()
 
 		except:
-			print('[SELENIUM ERROR] -> Cannot find elements on page')
+			self._print('[SELENIUM ERROR] -> Cannot find elements on page')
 			self.show_error_html('[SELENIUM ERROR] -> Cannot find elements on page')
 
 	def open_lms(self):
@@ -304,18 +308,18 @@ class WebSpider:
 					print(f'{n + 1})', course.get_attribute("aria-label"))
 					print()
 			else:
-				print('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
+				self._print('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
 				self.show_error_html('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
 
 
-	# TODO:
+	
 	def open_course_lms(self):
 		'''
 		Prints list of courses and clicks on/opens chosen
 		:return: None
 		'''
 		if self.driver:
-			print('[ANSWER] -> Вот все курсы: ')
+			self._print('[ANSWER] -> Вот все курсы: ')
 
 			self.show_courses_lms()
 
@@ -324,16 +328,28 @@ class WebSpider:
 			courses = self.driver.find_elements_by_class_name('ic-DashboardCard')
 
 			try:
-				print(f'[ANSWER] -> Отрываю курс {course_index}')
+				self._print(f'[ANSWER] -> Отрываю курс {course_index}')
 				courses[course_index - 1].click()
 
 			except IndexError:
-				print(f'[ERROR] -> нет курса с номером {course_index}')
+				self._print(f'[ERROR] -> нет курса с номером {course_index}')
 				self.show_error_html(f'[ERROR] -> нет курса с номером {course_index}')
 
 	# TODO:
 	def open_homework_lms(self):
-		pass
+		
+		if self.logged_in:
+			if self.LMS_COURSE_URL in self.driver.current_url:
+				section_list = self.driver.find_element_by_id('section-tabs').find_elements_by_tag_name('li')
+				
+				for action_element in section_list:
+					if action_element.text == 'Задания':
+						action_element.click()
+						return 
+			
+			else:
+				self._print('[ANSWER] -> Вы не на платформе Canvas. Cкажите мне её открыть')
+
 
 
 	def open_recordbook(self):
@@ -348,7 +364,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.RECORDBOOK_URL)
 			except:
-				print('[SELENIUM ERROR] -> Cannot open recordbook')
+				self._print('[SELENIUM ERROR] -> Cannot open recordbook')
 				self.show_error_html('[SELENIUM ERROR] -> Cannot open recordbook')
 
 	def show_weather(self):
@@ -363,7 +379,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.WEATHER_URL)
 			except:
-				print('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
+				self._print('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
 				self.show_error_html('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
 
 	def show_wifi_info(self):
@@ -378,7 +394,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.WIFI_INFO_URL)
 			except Exception as e:
-				print(f'[ERROR] -> {e}')
+				self._print(f'[ERROR] -> {e}')
 				self.show_error_html(str(e))
 
 	def show_services(self):
@@ -393,7 +409,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.SERVICES_URL)
 			except Exception as e:
-				print(f'[ERROR] -> {e}')
+				self._print(f'[ERROR] -> {e}')
 				self.show_error_html(str(e))
 
 	def show_student_id_info(self):
@@ -408,7 +424,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.STUDENT_CARD_INFO_URL)
 			except Exception as e:
-				print(f'[ERROR] -> {e}')
+				self._print(f'[ERROR] -> {e}')
 				self.show_error_html(str(e))
 
 	def exit(self):

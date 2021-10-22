@@ -18,6 +18,12 @@ class VoiceAssistant:
 		self.admin_panel = AdminPanel()
 
 	
+	def greeting(self):
+		print(Fore.YELLOW + '|---------------------------------|')
+		print(Fore.YELLOW + '| Привет! Леонид начинает работу! |')
+		print(Fore.YELLOW + '|---------------------------------|')
+
+
 	def handle_user_command(self, user_command):
 
 		'''
@@ -136,4 +142,5 @@ class VoiceAssistant:
 
 if __name__ == '__main__':
 	v = VoiceAssistant()
+	v.greeting()
 	v.run()

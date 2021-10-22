@@ -15,7 +15,7 @@ class Recognizer:
 		self.intents_and_answers = json.loads(open(self.intents_and_answers_filepath, encoding='utf-8').read())
 		self.intents_and_keywords = json.loads(open(self.intents_and_keywords_filepath, encoding='utf-8').read())
 		
-		self.unknown_commands_filepath = '../assets./errors/unknown_commands.json'
+		self.unknown_commands_filepath = '../assets/errors/unknown_commands.json'
 	
 	
 	def save_unknown_command(self, command):
@@ -48,9 +48,10 @@ class Recognizer:
 
 
 		for intent in self.intents_and_keywords:
-			for keyword in self.intents_and_keywords[intent]:
-				if keyword in command:
-					return intent
+			if intent != 'questions_about':
+				for keyword in self.intents_and_keywords[intent]:
+					if keyword in command:
+						return intent
 
 		
 		#TODO: classify intent if none of the keywords are present

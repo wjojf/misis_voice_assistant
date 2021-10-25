@@ -110,7 +110,7 @@ class WebSpider:
 			return
 
 		else:
-			self._print('[ERROR] -> Command not recognized')
+			self._print('[ОШИБКА] -> Команда не распознана')
 			self.ask_save_password()
 
 	def log_in(self):
@@ -150,7 +150,7 @@ class WebSpider:
 				login_element.send_keys(login)
 			
 			except:
-				self._print('[ERROR] -> Cannot find login element on page:(')
+				self._print('[ОШИБКА] -> Не смог найти поле для логина:(')
 				return
 
 			try:
@@ -158,7 +158,7 @@ class WebSpider:
 				password_element.send_keys(password)
 			
 			except:
-				self._print('[ERROR] -> Не могу найти поле для ввода пароля:(')
+				self._print('[ОШИБКА] -> Не могу найти поле для ввода пароля:(')
 				return 
 			
 			try:
@@ -166,14 +166,14 @@ class WebSpider:
 				button_element.click()
 			
 			except:
-				self._print('[ERROR] -> Не могу найти кнопку ввода:(')
+				self._print('[ОШИБКА] -> Не могу найти кнопку ввода:(')
 				return 
 		
 			curr_url = self.driver.current_url
 
 			#IF LOGGED IN
 			if curr_url.split('/')[-2] == 'services':
-				self._print('[SELENIUM INFO] -> Успешно выполнен вход!')
+				self._print('[SELENIUM] -> Успешно выполнен вход!')
 				self.logged_in = True
 				write_log_in()
 
@@ -258,7 +258,7 @@ class WebSpider:
 			email, password = self.get_user_data()
 		
 		except ValueError:
-			self._print('[SELENIUM ERROR] -> user data: ', self.get_user_data())
+			self._print('[ОШИБКА SELENIUM] -> user data: ', self.get_user_data())
 			self.show_error_html('Cannot get user data:(')
 
 			return
@@ -273,8 +273,8 @@ class WebSpider:
 			button_element.click()
 
 		except:
-			self._print('[SELENIUM ERROR] -> Cannot find elements on page')
-			self.show_error_html('[SELENIUM ERROR] -> Cannot find elements on page')
+			self._print('[ОШИБКА SELENIUM] -> Cannot find elements on page')
+			self.show_error_html('[ОШИБКА SELENIUM] -> Cannot find elements on page')
 
 	def open_lms(self):
 		'''
@@ -319,7 +319,7 @@ class WebSpider:
 		:return: None
 		'''
 		if self.driver:
-			self._print('[ANSWER] -> Вот все курсы: ')
+			self._print('[Леонид] -> Вот все курсы: ')
 
 			self.show_courses_lms()
 
@@ -328,12 +328,12 @@ class WebSpider:
 			courses = self.driver.find_elements_by_class_name('ic-DashboardCard')
 
 			try:
-				self._print(f'[ANSWER] -> Отрываю курс {course_index}')
+				self._print(f'[Леонид] -> Отрываю курс {course_index}')
 				courses[course_index - 1].click()
 
 			except IndexError:
-				self._print(f'[ERROR] -> нет курса с номером {course_index}')
-				self.show_error_html(f'[ERROR] -> нет курса с номером {course_index}')
+				self._print(f'[ОШИБКА] -> нет курса с номером {course_index}')
+				self.show_error_html(f'[ОШИБКА] -> нет курса с номером {course_index}')
 
 	# TODO:
 	def open_homework_lms(self):
@@ -348,7 +348,7 @@ class WebSpider:
 						return 
 			
 			else:
-				self._print('[ANSWER] -> Вы не на платформе Canvas. Cкажите мне её открыть')
+				self._print('[Леонид] -> Вы не на платформе Canvas. Cкажите мне её открыть')
 
 
 
@@ -364,8 +364,8 @@ class WebSpider:
 			try:
 				self.driver.get(self.RECORDBOOK_URL)
 			except:
-				self._print('[SELENIUM ERROR] -> Cannot open recordbook')
-				self.show_error_html('[SELENIUM ERROR] -> Cannot open recordbook')
+				self._print('[ОШИБКА SELENIUM] -> Не могу открыть зачёту')
+				self.show_error_html('[ОШИБКА SELENIUM] -> Не могу открыть зачётку')
 
 	def show_weather(self):
 		'''
@@ -379,8 +379,8 @@ class WebSpider:
 			try:
 				self.driver.get(self.WEATHER_URL)
 			except:
-				self._print('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
-				self.show_error_html('[SELENIUM ERROR] -> CANNOT OPEN WEATHER SITE')
+				self._print('[ОШИБКА SELENIUM] -> Не смог открыть прогноз погоды')
+				self.show_error_html('[ОШИБКА SELENIUM] -> Не смог открыть прогноз погоды')
 
 	def show_wifi_info(self):
 		'''
@@ -394,7 +394,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.WIFI_INFO_URL)
 			except Exception as e:
-				self._print(f'[ERROR] -> {e}')
+				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
 	def show_services(self):
@@ -409,7 +409,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.SERVICES_URL)
 			except Exception as e:
-				self._print(f'[ERROR] -> {e}')
+				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
 	def show_student_id_info(self):
@@ -424,7 +424,7 @@ class WebSpider:
 			try:
 				self.driver.get(self.STUDENT_CARD_INFO_URL)
 			except Exception as e:
-				self._print(f'[ERROR] -> {e}')
+				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
 	def exit(self):

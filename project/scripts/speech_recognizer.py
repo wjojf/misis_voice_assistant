@@ -8,7 +8,7 @@ class SpeechRecognizer:
 	def __init__(self):
 		self.listener = sr.Recognizer()
 		self.engine = pyttsx3.init()
-		self.engine.runAndWait()
+
 
 
 	def take_command(self):
@@ -18,7 +18,7 @@ class SpeechRecognizer:
 		'''
 		try:
 			with sr.Microphone() as source:
-				print('[INFO] -> Listening...')
+				print(Fore.YELLOW + '[Леонид] -> Cлушаю команду...')
 				voice = self.listener.listen(source)
 				command = self.listener.recognize_google(voice, language='ru-RU')
 
@@ -30,5 +30,6 @@ class SpeechRecognizer:
 		return command != 'ошибка!'
 
 	def say(self, command):
-		print(Fore.YELLOW + '[ANSWER] {}'.format(command))
+		print(Fore.YELLOW + '[Леонид] {}'.format(command))
 		self.engine.say(command)
+		self.engine.runAndWait()

@@ -27,7 +27,8 @@ class VoiceAssistant:
 	def handle_user_command(self, user_command):
 
 		'''
-		Execute function if command understood, otherwise say command is not understood
+		Execute function if command understood,
+		otherwise say command is not understood
 		:param user_command: str
 		:return: None
 		'''
@@ -44,7 +45,8 @@ class VoiceAssistant:
 	def authorize(self):
 		'''
         Store user data into files
-        curr_password for saving data itself; logged_in for bool (True = logged, False = not)
+        curr_password for saving data itself; logged_in for bool
+        (True = logged, False = not)
         :param login: str -> login
         :param password: str -> user_password
         :return:
@@ -57,7 +59,7 @@ class VoiceAssistant:
 		# otherwise input password 
 		except:
 			login = input('[AUTH] m1111111@edu.misis.ru -> ')
-			password = input('[AUTH] password -> ')
+			password = input('[AUTH] Пароль -> ')
 
 		self.login = login
 
@@ -67,7 +69,7 @@ class VoiceAssistant:
 		with open('../assets/user_status/logged_in.txt', 'w', encoding='utf-8') as status_file:
 			status_file.write('True')
 
-		print('[INFO] -> Saved user data')
+		print('[INFO] -> Получил данные пользователя')
 
 	def run(self):
 		'''
@@ -78,16 +80,16 @@ class VoiceAssistant:
 
 		self.authorize()
 
-		print('[INFO] -> STARTING...')
+		print('[INFO] -> Начинаю работу...')
 
 		#MAIN LOOP
 		while True:
 
-			user_input = input('[INPUT] -> Input action(/C:command, /Q: quit)').lower()
+			user_input = input('[ВВОД] -> Что хотите сделать(/C:ввести команду, /Q: выйти)').lower()
 
 			if user_input == '/c' or user_input == '/command':
 
-				input_type = input('Voice/Keyboard: [/v, /k, /a(admins only)]').lower()
+				input_type = input('Голосом/Kлавиатурой: [/v, /k, /a(мод админа)]').lower()
 				
 				if input_type == '/v':
 
@@ -104,7 +106,7 @@ class VoiceAssistant:
 						sleep(2)
 				
 				elif input_type == '/k':
-					command = input(Fore.GREEN + '[KEYBOARD_INPUT] -> Введите команду: ')
+					command = input(Fore.GREEN + '[ВВОД] -> Введите команду: ')
 					self.handle_user_command(command)
 
 
@@ -115,7 +117,7 @@ class VoiceAssistant:
 
 						self.admin_panel.list()
 
-						admin_command = input( Fore.RED + '[ADMIN] Enter command -> ')
+						admin_command = input( Fore.RED + '[ADMIN] Введите команду -> ')
 
 						if admin_command in self.admin_panel.commands_list:
 
@@ -132,7 +134,7 @@ class VoiceAssistant:
 
 
 	def exit(self):
-		print('[INFO] -> Завершаю работу...')
+		print(Fore.YELLOW + '[INFO] -> Завершаю работу...')
 		self.spider.exit()
 
 

@@ -16,7 +16,7 @@ class AdminPanel:
 		return user.lower() in admins_list
 
 	def ban(self):
-		user_to_ban = input('[ADMIN] -> input user to ban: ')
+		user_to_ban = input('[АДМИН] -> юзер для бана: ')
 
 		admins_list = json.loads(open(self.ADMINS_FILEPATH, 'r', encoding='utf-8').read())['users']
 
@@ -28,15 +28,15 @@ class AdminPanel:
 
 			with open(self.BANNED_FILEPATH, 'w') as banned_file:
 				json.dump(banned_users, banned_file)
-				print(f'[INFO] Successfully banned {user_to_ban}')
+				print(f'[INFO] Успешно забанен пользователь {user_to_ban}')
 
 
 	def list(self):
-		print(Fore.RED + '[ADMIN MODE]')
-		print('List of admin commands: ')
+		print(Fore.RED + '[РЕЖИМ АДМИНА]')
+		print('Cписок команд админа: ')
 
 		for command in self.commands_list:
-			print(Fore.GREEN + f'[COMMAND] -> {command}')
+			print(Fore.GREEN + f'[КОМАНДА] -> {command}')
 
 
 	def add_keyword(self):
@@ -91,5 +91,5 @@ class AdminPanel:
 
 		with open(funcs_filepath, 'w', encoding='utf-8') as json_file:
 			json.dump(intents_and_funcs, json_file)
-			print(f'[INFO] -> Successfully added {func} to {intent}')
+			print(f'[INFO] -> Успешно добавил {func} в {intent}')
 

@@ -25,6 +25,12 @@
 		"canvas",
 		"lms"
 	],
+	"open_email": [
+		"почту",
+		"почта",
+		"email",
+		"gmail"
+	],
 	"open_teams":[
 		"тимс",
 		"открой тимс"

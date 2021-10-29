@@ -5,6 +5,7 @@
 	"show_weather": "self.spider.show_weather()",
 	"open_lms": "self.spider.open_lms()",
 	"open_teams": "self.spider.open_teams()",
+	"open_email": "self.spider.open_email()",
 	"show_recordbook": "self.spider.open_recordbook()",
 	"show_courses_lms": "self.spider.show_courses_lms()",
 	"open_course_lms": "self.spider.open_course_lms()",

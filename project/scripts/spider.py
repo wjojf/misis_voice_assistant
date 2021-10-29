@@ -28,6 +28,8 @@ class WebSpider:
 		self.WIFI_INFO_URL = 'https://login.misis.ru/ru/s68987/wifis'
 		self.SERVICES_URL = 'https://login.misis.ru/ru/s68987/rqsvc_requests'
 		self.STUDENT_CARD_INFO_URL = 'https://login.misis.ru/ru/s68987/stud_registry'
+		self.GOOGLE_SERVICES_URL = 'https://login.misis.ru/ru/s68987/services/google'
+		self.GMAIL_URL = 'https://mail.google.com/a/edu.misis.ru/'
 		
 		# USER STATUS
 		self.logged_in = False
@@ -67,8 +69,9 @@ class WebSpider:
 			except Exception as e:
 				self.show_error_html(str(e))
 			
-			sleep(10)
+			sleep(8)
 			self.info_page_driver.quit()
+			self.info_page_driver = None
 		
 		else:
 			self.info_page_driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -96,17 +99,21 @@ class WebSpider:
 
 		user_answer = input('[INPUT] -> Save password?(y/n): ')
 
+		#print(Fore.RED + f'[DEBUG] -> {user_answer}')
+
 		if user_answer.lower() in ['yes', 'y']:
 			self.save_password = True
 			self.delete_password = False
-
+			#print('save')
 
 
 			return
 
 		elif user_answer.lower() in ['no', 'n']:
+			#print('delete')
 			self.save_password = False
 			self.delete_password = True
+
 			return
 
 		else:
@@ -335,7 +342,7 @@ class WebSpider:
 				self._print(f'[ОШИБКА] -> нет курса с номером {course_index}')
 				self.show_error_html(f'[ОШИБКА] -> нет курса с номером {course_index}')
 
-	# TODO:
+
 	def open_homework_lms(self):
 		
 		if self.logged_in:
@@ -427,6 +434,28 @@ class WebSpider:
 				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
+	def open_email(self):
+
+		if not(self.logged_in):
+			self.log_in()
+
+		if self.logged_in:
+			try:
+				self.driver.get(self.GOOGLE_SERVICES_URL)
+				'''
+				<div class="col-sm-2" style="padding-top: 20px; padding-bottom: 20px;"><a href="https://mail.google.com/a/edu.misis.ru/"> <span>Gmail</span></a></div>
+				'''
+				gmail_element = self.driver.find_elements_by_class_name('col-sm-2')[0]
+				try:
+					gmail_element.click()
+				except Exception as e:
+					self._print(f'[ОШИБКА] -> {e}')
+					self.show_error_html(str(e))
+			except Exception as e:
+				self._print(f'[ОШИБКА] -> {e}')
+				self.show_error_html(str(e))
+
+
 	def exit(self):
 
 		'''
@@ -440,7 +469,7 @@ class WebSpider:
 			self.logged_in = False
 
 
-			if self.delete_password:
+			if not(self.save_password):
 
 				with open(self.logged_in_filepath, 'w') as logged_in_file:
 					logged_in_file.write('False')

@@ -4,8 +4,7 @@ from speech_recognizer import SpeechRecognizer
 from admin import AdminPanel
 from time import sleep
 from colorama import init, Fore, Back, Style
-from bs4 import BeautifulSoup as bs
-import sys
+import getpass
 
 init(autoreset=True)
 class VoiceAssistant:
@@ -58,8 +57,8 @@ class VoiceAssistant:
 		
 		# otherwise input password 
 		except:
-			login = input('[AUTH] m1111111@edu.misis.ru -> ')
-			password = input('[AUTH] Пароль -> ')
+			login = input(Fore.MAGENTA + '[AUTH] m1111111@edu.misis.ru -> ')
+			password = input(Fore.MAGENTA + '[AUTH] Пароль -> ')
 
 		self.login = login
 
@@ -85,11 +84,11 @@ class VoiceAssistant:
 		#MAIN LOOP
 		while True:
 
-			user_input = input('[ВВОД] -> Что хотите сделать(/C:ввести команду, /Q: выйти)').lower()
+			user_input = input(Fore.GREEN + '[ВВОД] -> Что хотите сделать(/C:ввести команду, /Q: выйти)').lower()
 
 			if user_input == '/c' or user_input == '/command':
 
-				input_type = input('Голосом/Kлавиатурой: [/v, /k, /a(мод админа)]').lower()
+				input_type = input(Fore.LIGHTYELLOW_EX + 'Голосом/Kлавиатурой: [/v, /k, /a(мод админа)]').lower()
 				
 				if input_type == '/v':
 

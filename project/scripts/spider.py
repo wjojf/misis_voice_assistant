@@ -77,6 +77,7 @@ class WebSpider:
 			self.info_page_driver = webdriver.Chrome(ChromeDriverManager().install())
 			self.show_assistant_info()
 
+
 	def get_user_data(self):
 
 		'''
@@ -434,6 +435,7 @@ class WebSpider:
 				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
+	#TODO:
 	def open_email(self):
 
 		if not(self.logged_in):
@@ -454,6 +456,44 @@ class WebSpider:
 			except Exception as e:
 				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
+
+	#TODO:
+	def log_in_gmail(self):
+
+		user_data = self.get_user_data()
+
+		gmail_login = user_data[0].split('@')[0]
+
+		same_password = input(Fore.YELLOW + '[ВВОД] -> пароли для почты и ЛК совпадают?(y/n): ').lower()
+
+		if same_password in ['y', 'yes']:
+			gmail_password = user_data[1]
+
+		elif same_password in ['n', 'no']:
+			gamil_password = input(Fore.MAGENTA + '[ВВОД] -> Пароль для gmail: ')
+
+		if gmail_login and gamil_password:
+			try:
+				password_element = self.driver.find_element_by_id('password')
+				password_element.send_keys(gmail_password)
+
+				try:
+					submit_element = self.driver.find_element_by_xpath('//button')
+					submit_element.click()
+
+				except Exception as e:
+
+					self._print(f'[ОШИБКА] -> {e}')
+					self.show_error_html(str(e))
+
+			except Exception as e:
+				self._print(f'[ОШИБКА] -> {e}')
+				self.show_error_html(str(e))
+
+
+
+
+
 
 
 	def exit(self):
@@ -476,6 +516,12 @@ class WebSpider:
 
 				with open(self.password_filepath, 'w') as password_file:
 					password_file.write('')
+
+				with open('../assets/passwords/password_saved.txt', 'w') as f:
+					f.write('False')
+			else:
+				with open('../assets/passwords/password_saved.txt', 'w') as f:
+					f.write('True')
 
 
 		try:

@@ -4,18 +4,19 @@ from speech_recognizer import SpeechRecognizer
 from admin import AdminPanel
 from time import sleep
 from colorama import init, Fore, Back, Style
-import getpass
+
 
 init(autoreset=True)
 class VoiceAssistant:
 
 	def __init__(self):
-		self.logged_in_file = '../assets/user_status/logged_in.txt'
+
 		self.recognizer = Recognizer()
 		self.spider = WebSpider()
 		self.speech_recognizer = SpeechRecognizer()
 		self.admin_panel = AdminPanel()
 
+		self.logged_in_file = '../assets/user_status/logged_in.txt'
 	
 	def greeting(self):
 		print(Fore.YELLOW + '|---------------------------------|')
@@ -70,7 +71,7 @@ class VoiceAssistant:
 
 		print('[INFO] -> Получил данные пользователя')
 
-	def run(self):
+	def run_cmd(self):
 		'''
 		Mainloop
 		While command != quit: take new command, classify it and execute if classified
@@ -144,4 +145,4 @@ class VoiceAssistant:
 if __name__ == '__main__':
 	v = VoiceAssistant()
 	v.greeting()
-	v.run()
+	v.run_cmd()

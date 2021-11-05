@@ -1,5 +1,7 @@
+import tkinter
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from tkinter import simpledialog
 from time import sleep
 from colorama import init, Fore, Back, Style
 
@@ -280,9 +282,8 @@ class WebSpider:
 			password_element.send_keys(password)
 			button_element.click()
 
-		except:
-			self._print('[ОШИБКА SELENIUM] -> Cannot find elements on page')
-			self.show_error_html('[ОШИБКА SELENIUM] -> Cannot find elements on page')
+		except: # ALREADY AUTHORIZED
+			pass
 
 	def open_lms(self):
 		'''
@@ -530,6 +531,50 @@ class WebSpider:
 			pass
 
 
+	# GUI FUNCS
+	def ask_save_password_gui(self):
+		msg = tkinter.Tk()
+		msg.withdraw()
 
+		save_password = simpledialog.askstring('Сохранить пароль?', "Сохранить пароль(y/n)?", parent=msg)
+
+		if save_password.lower() in ['y', 'yes']:
+			return True
+
+		elif save_password.lower() in ['n', 'no']:
+			return False
+
+		self.ask_save_password_gui()
+
+
+	def exit_gui(self):
+
+
+		self.save_password = self.ask_save_password_gui()
+
+
+		if self.logged_in:
+
+			self.logged_in = False
+
+			if not(self.save_password):
+
+				with open(self.logged_in_filepath, 'w') as logged_in_file:
+					logged_in_file.write('False')
+
+				with open(self.password_filepath, 'w') as password_file:
+					password_file.write('')
+
+				with open('../assets/passwords/password_saved.txt', 'w') as f:
+					f.write('False')
+			else:
+				with open('../assets/passwords/password_saved.txt', 'w') as f:
+					f.write('True')
+
+
+		try:
+			self.driver.close()
+		except:
+			pass
 
 

@@ -28,7 +28,14 @@ class LeoindGUI:
         print(self.password_saved)
 
 
+        # SPECIAL FUNCS (GUI exceptions) 
+        self.SPECIAL_FUNCS = {
+            "self.spider.open_course_lms()": "self.open_course_lms()",
+            "self.spider.exit()": "self.spider.exit_gui()"
+        }
 
+
+        # GET USER DATA
         if self.password_saved == 'False':
             msg = tkinter.Tk()
             msg.withdraw()
@@ -82,9 +89,38 @@ class LeoindGUI:
         self.win.mainloop()
 
 
-    def take_user_input(self):
-        return self.input_area.get('1.0', 'end')
+    def handle_user_input(self):
+        '''
+        Key func
+        Take user input and sends answer
+        Exec funcntion if intent recognized
+        :return: None
+        '''
 
+        user_input = self.take_user_input()
+        if user_input: #if something written
+            self.input_area.delete('1.0', 'end')#clear input area
+
+            self.write_user_message(user_input)#send input to text area
+
+            func = self.recognizer.get_func(user_input)#if command understood 
+            
+            self.write_assistant_answer(func['answer']) # send answer to text area
+            sleep(2)
+
+            if func['func'] is not None:
+                
+                if func['func'] in self.SPECIAL_FUNCS: #if funcs should be executed differently in cmd/gui version
+                    eval(self.SPECIAL_FUNCS[func['func']])
+                
+                else:
+                    eval(func['func'])
+
+    
+    def take_user_input(self):
+        return self.input_area.get('1.0', 'end').strip()
+
+    
     def write_user_message(self, message):
         '''
         Shows the message in text area
@@ -98,6 +134,7 @@ class LeoindGUI:
         self.text_area.yview('end')
         self.text_area.config(state='disabled')
 
+    
     def write_assistant_answer(self, answer):
         assistant_message = f"[Леонид]: {answer}"
 
@@ -107,21 +144,48 @@ class LeoindGUI:
         self.text_area.config(state='disabled')
 
 
-    def handle_user_input(self):
+    
+    def open_course_lms(self):
+        
+        def show_courses_lms():
+            '''
+            Prints list of courses on canvas
+            :return: None
+            '''
+            if self.spider.driver:
 
-        user_input = self.take_user_input()
-        if user_input:
-            self.input_area.delete('1.0', 'end')
+                if self.spider.LMS_URL in self.spider.driver.current_url:
+                    courses = self.spider.driver.find_elements_by_class_name('ic-DashboardCard')
+                    for n, course in enumerate(courses):
+                        self.write_assistant_answer(f'{n + 1}) {course.get_attribute("aria-label")}')
+    
+                else:
+                    self.write_assistant_answer('Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
+                    self.spider.show_error_html('[ERROR] -> Вы не на платформе LMS Canvas. Скажите "октрой канвас" или что-то похоже...')
 
-            self.write_user_message(user_input)
+        '''
+        Prints list of courses and clicks on/opens chosen
+        :return: None
+        '''
+        if self.spider.driver:
+            self.write_assistant_answer('Вот все курсы: ')
 
-            func = self.recognizer.get_func(user_input)
-            self.write_assistant_answer(func['answer'])
-            sleep(2)
+            show_courses_lms()
 
-            if func['func'] is not None:
-                eval(func['func'])
 
+            msg = tkinter.Tk()
+            msg.withdraw()
+            course_index = simpledialog.askinteger('Номер курса', 'Введите номер курса',parent=msg)
+
+            courses = self.spider.driver.find_elements_by_class_name('ic-DashboardCard')
+
+            try:
+                self.write_assistant_answer(f'Отрываю курс {course_index}')
+                courses[course_index - 1].click()
+
+            except IndexError:
+                self.write_assistant_answer(f'нет курса с номером {course_index}')
+                self.spider.show_error_html(f'[ОШИБКА] -> нет курса с номером {course_index}')
 
 
 
@@ -130,7 +194,7 @@ class LeoindGUI:
     def stop(self):
         self.running = False
         self.win.destroy()
-        self.spider.exit()
+        self.spider.exit_gui()
         exit(0)
 
 

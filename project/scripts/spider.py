@@ -542,6 +542,7 @@ class WebSpider:
 			return True
 
 		elif save_password.lower() in ['n', 'no']:
+
 			return False
 
 		self.ask_save_password_gui()
@@ -550,27 +551,28 @@ class WebSpider:
 	def exit_gui(self):
 
 
-		self.save_password = self.ask_save_password_gui()
-
+		save_password = self.ask_save_password_gui()
+		print(save_password)
 
 		if self.logged_in:
 
 			self.logged_in = False
 
-			if not(self.save_password):
 
-				with open(self.logged_in_filepath, 'w') as logged_in_file:
-					logged_in_file.write('False')
+		if save_password:
+			with open('../assets/passwords/password_saved.txt', 'w') as f:
+				f.write('True')
 
-				with open(self.password_filepath, 'w') as password_file:
-					password_file.write('')
+		else:
+			#print('Rewriting data')
+			with open(self.logged_in_filepath, 'w') as logged_in_file:
+				logged_in_file.write('False')
 
-				with open('../assets/passwords/password_saved.txt', 'w') as f:
-					f.write('False')
-			else:
-				with open('../assets/passwords/password_saved.txt', 'w') as f:
-					f.write('True')
+			with open(self.password_filepath, 'w') as password_file:
+				password_file.write('')
 
+			with open('../assets/passwords/password_saved.txt', 'w') as f:
+				f.write('False')
 
 		try:
 			self.driver.close()

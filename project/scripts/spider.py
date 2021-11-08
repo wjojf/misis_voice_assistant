@@ -4,19 +4,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 from tkinter import simpledialog
 from time import sleep
 from colorama import init, Fore, Back, Style
+from authorizer import Authorizer
 
 class WebSpider:
 
 	def __init__(self):
+		self.authorizer = Authorizer()
 		self.driver = None
 		self.info_page_driver = None
 
 		# HTMLS
 		self.ASSISTANT_INFO_HTML = '../assets/html/AssistantInfo.html'
+		self.WrongLoginPasswordError_html = '../assets/html/wrong_login.html'
 
-		# AUTHORIZATION FILES
-		self.logged_in_filepath = '../assets/user_status/logged_in.txt'
-		self.password_filepath = '../assets/user_status/curr_password.txt'
 
 		# URLS
 		self.authorization_url = 'https://login.misis.ru/user/users/sign_in'
@@ -35,8 +35,6 @@ class WebSpider:
 		
 		# USER STATUS
 		self.logged_in = False
-		self.save_password = False
-		self.delete_password = True
 
 
 	def _print(self, message):
@@ -80,48 +78,6 @@ class WebSpider:
 			self.show_assistant_info()
 
 
-	def get_user_data(self):
-
-		'''
-		Get user data from .txt file
-		:return: [login, password]
-		'''
-
-		try:
-			with open(self.password_filepath) as file:
-				return file.readline().split('|')
-		except:
-			return 'Error!'
-
-	def ask_save_password(self):
-		'''
-		Change status for saving password after exit
-		:return: None
-		'''
-
-
-		user_answer = input('[INPUT] -> Save password?(y/n): ')
-
-		#print(Fore.RED + f'[DEBUG] -> {user_answer}')
-
-		if user_answer.lower() in ['yes', 'y']:
-			self.save_password = True
-			self.delete_password = False
-			#print('save')
-
-
-			return
-
-		elif user_answer.lower() in ['no', 'n']:
-			#print('delete')
-			self.save_password = False
-			self.delete_password = True
-
-			return
-
-		else:
-			self._print('[ОШИБКА] -> Команда не распознана')
-			self.ask_save_password()
 
 	def log_in(self):
 		'''
@@ -138,19 +94,12 @@ class WebSpider:
 		'''
 
 
-		def write_log_in():
-			with open(self.logged_in_filepath, 'w', encoding='utf-8') as file:
-				file.write('True')
-
-
-
-		
 		self.driver = webdriver.Chrome(ChromeDriverManager().install())
 		
 		
 		try:
 
-			login, password = self.get_user_data()
+			login, password = self.authorizer.get_user_data()
 
 		
 			self.driver.get(self.authorization_url)
@@ -185,7 +134,7 @@ class WebSpider:
 			if curr_url.split('/')[-2] == 'services':
 				self._print('[SELENIUM] -> Успешно выполнен вход!')
 				self.logged_in = True
-				write_log_in()
+				self.authorizer.write_log_in()
 
 					
 			else:
@@ -194,7 +143,7 @@ class WebSpider:
 
 
 		except ValueError:
-			self._print('[ERROR] Не смог найти данные пользователя ->', self.get_user_data())
+			self._print(f'[ERROR] Не смог найти данные пользователя -> {self.authorizer.get_user_data()}')
 			self.show_error_html('Не смог найти данные пользователя:(')
 
 	
@@ -234,7 +183,6 @@ class WebSpider:
 		if self.logged_in:
 			try:
 				self.driver.get(self.CURRICULUM_URL)
-				sleep(5)
 			except Exception as e:
 				self.show_error_html(str(e))
 		
@@ -255,7 +203,6 @@ class WebSpider:
 
 			try:
 				self.driver.get(self.INFO_URL)
-				sleep(5)
 			except Exception as e:
 				self.show_error_html(str(e))
 
@@ -265,10 +212,10 @@ class WebSpider:
 		:return:
 		'''
 		try:
-			email, password = self.get_user_data()
+			email, password = self.authorizer.get_user_data()
 		
 		except ValueError:
-			self._print('[ОШИБКА SELENIUM] -> user data: ', self.get_user_data())
+			self._print('[ОШИБКА SELENIUM] -> user data: ', self.authorizer.get_user_data())
 			self.show_error_html('Cannot get user data:(')
 
 			return
@@ -458,121 +405,45 @@ class WebSpider:
 				self._print(f'[ОШИБКА] -> {e}')
 				self.show_error_html(str(e))
 
-	#TODO:
-	def log_in_gmail(self):
-
-		user_data = self.get_user_data()
-
-		gmail_login = user_data[0].split('@')[0]
-
-		same_password = input(Fore.YELLOW + '[ВВОД] -> пароли для почты и ЛК совпадают?(y/n): ').lower()
-
-		if same_password in ['y', 'yes']:
-			gmail_password = user_data[1]
-
-		elif same_password in ['n', 'no']:
-			gamil_password = input(Fore.MAGENTA + '[ВВОД] -> Пароль для gmail: ')
-
-		if gmail_login and gamil_password:
-			try:
-				password_element = self.driver.find_element_by_id('password')
-				password_element.send_keys(gmail_password)
-
-				try:
-					submit_element = self.driver.find_element_by_xpath('//button')
-					submit_element.click()
-
-				except Exception as e:
-
-					self._print(f'[ОШИБКА] -> {e}')
-					self.show_error_html(str(e))
-
-			except Exception as e:
-				self._print(f'[ОШИБКА] -> {e}')
-				self.show_error_html(str(e))
-
-
-
-
-
+	# #TODO:
+	# def log_in_gmail(self):
+	#
+	# 	user_data = self.get_user_data()
+	#
+	# 	gmail_login = user_data[0].split('@')[0]
+	#
+	# 	same_password = input(Fore.YELLOW + '[ВВОД] -> пароли для почты и ЛК совпадают?(y/n): ').lower()
+	#
+	# 	if same_password in ['y', 'yes']:
+	# 		gmail_password = user_data[1]
+	#
+	# 	elif same_password in ['n', 'no']:
+	# 		gamil_password = input(Fore.MAGENTA + '[ВВОД] -> Пароль для gmail: ')
+	#
+	# 	if gmail_login and gamil_password:
+	# 		try:
+	# 			password_element = self.driver.find_element_by_id('password')
+	# 			password_element.send_keys(gmail_password)
+	#
+	# 			try:
+	# 				submit_element = self.driver.find_element_by_xpath('//button')
+	# 				submit_element.click()
+	#
+	# 			except Exception as e:
+	#
+	# 				self._print(f'[ОШИБКА] -> {e}')
+	# 				self.show_error_html(str(e))
+	#
+	# 		except Exception as e:
+	# 			self._print(f'[ОШИБКА] -> {e}')
+	# 			self.show_error_html(str(e))
+	#
 
 
 	def exit(self):
 
-		'''
-		Close WebDriver, write user status
-		:return:
-		'''
-		self.ask_save_password()
-
 		if self.logged_in:
-
 			self.logged_in = False
-
-
-			if not(self.save_password):
-
-				with open(self.logged_in_filepath, 'w') as logged_in_file:
-					logged_in_file.write('False')
-
-				with open(self.password_filepath, 'w') as password_file:
-					password_file.write('')
-
-				with open('../assets/passwords/password_saved.txt', 'w') as f:
-					f.write('False')
-			else:
-				with open('../assets/passwords/password_saved.txt', 'w') as f:
-					f.write('True')
-
-
-		try:
-			self.driver.close()
-		except:
-			pass
-
-
-	# GUI FUNCS
-	def ask_save_password_gui(self):
-		msg = tkinter.Tk()
-		msg.withdraw()
-
-		save_password = simpledialog.askstring('Сохранить пароль?', "Сохранить пароль(y/n)?", parent=msg)
-
-		if save_password.lower() in ['y', 'yes']:
-			return True
-
-		elif save_password.lower() in ['n', 'no']:
-
-			return False
-
-		self.ask_save_password_gui()
-
-
-	def exit_gui(self):
-
-
-		save_password = self.ask_save_password_gui()
-		print(save_password)
-
-		if self.logged_in:
-
-			self.logged_in = False
-
-
-		if save_password:
-			with open('../assets/passwords/password_saved.txt', 'w') as f:
-				f.write('True')
-
-		else:
-			#print('Rewriting data')
-			with open(self.logged_in_filepath, 'w') as logged_in_file:
-				logged_in_file.write('False')
-
-			with open(self.password_filepath, 'w') as password_file:
-				password_file.write('')
-
-			with open('../assets/passwords/password_saved.txt', 'w') as f:
-				f.write('False')
 
 		try:
 			self.driver.close()

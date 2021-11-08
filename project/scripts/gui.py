@@ -6,6 +6,7 @@ from recognizer import Recognizer
 from speech_recognizer import SpeechRecognizer
 from spider import WebSpider
 from admin import AdminPanel
+from authorizer import Authorizer
 from time import sleep
 
 
@@ -17,6 +18,7 @@ class LeoindGUI:
         self.spider = WebSpider()
         self.speech_recognizer = SpeechRecognizer()
         self.admin_panel = AdminPanel()
+        self.authorizer = Authorizer()
 
         # FILEPATH
         self.password_saved_filepath = '../assets/passwords/password_saved.txt'
@@ -31,7 +33,7 @@ class LeoindGUI:
         # SPECIAL FUNCS (GUI exceptions) 
         self.SPECIAL_FUNCS = {
             "self.spider.open_course_lms()": "self.open_course_lms()",
-            "self.spider.exit()": "self.spider.exit_gui()"
+            "self.exit()": "self.stop()",
         }
 
 
@@ -44,14 +46,12 @@ class LeoindGUI:
             self.password = simpledialog.askstring('Пароль', "Введите пароль", parent=msg)
 
 
-            with open('../assets/user_status/curr_password.txt', 'w', encoding='utf-8') as users_file:
-                users_file.write(f'{self.login}|{self.password}')
-            with open('../assets/user_status/logged_in.txt', 'w', encoding='utf-8') as status_file:
-                status_file.write('True')
+            self.authorizer.write_login_password(self.login, self.password)
+            self.authorizer.write_log_in()
 
 
         else:
-            self.login, self.password = self.spider.get_user_data()
+            self.login, self.password = self.authorizer.get_user_data()
 
         print('[INFO] -> Получил данные пользователя')
 
@@ -60,6 +60,7 @@ class LeoindGUI:
 
     def gui_loop(self):
         self.win = tkinter.Tk()
+        self.win.title('Леонид МИСиС')
         self.win.configure(bg='lightgray')
 
         self.chat_label = tkinter.Label(self.win, text='Chat', bg='lightgray')
@@ -174,6 +175,7 @@ class LeoindGUI:
 
 
             msg = tkinter.Tk()
+            msg.eval('tk::PlaceWindow . center')
             msg.withdraw()
             course_index = simpledialog.askinteger('Номер курса', 'Введите номер курса',parent=msg)
 
@@ -194,9 +196,9 @@ class LeoindGUI:
     def stop(self):
         self.running = False
         self.win.destroy()
-        self.spider.exit_gui()
+        self.authorizer.exit_gui()
+        self.spider.exit()
         exit(0)
-
 
 
 

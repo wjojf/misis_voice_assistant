@@ -2,6 +2,7 @@ from spider import WebSpider
 from recognizer import Recognizer
 from speech_recognizer import SpeechRecognizer
 from admin import AdminPanel
+from authorizer import Authorizer
 from time import sleep
 from colorama import init, Fore, Back, Style
 
@@ -11,6 +12,7 @@ class VoiceAssistant:
 
 	def __init__(self):
 
+		self.authorizer = Authorizer()
 		self.recognizer = Recognizer()
 		self.spider = WebSpider()
 		self.speech_recognizer = SpeechRecognizer()
@@ -54,7 +56,7 @@ class VoiceAssistant:
 
 		# if password saved
 		try:
-			login, password = self.spider.get_user_data()
+			login, password = self.authorizer.get_user_data()
 		
 		# otherwise input password 
 		except:
@@ -63,11 +65,9 @@ class VoiceAssistant:
 
 		self.login = login
 
-		with open('../assets/user_status/curr_password.txt', 'w', encoding='utf-8') as users_file:
-			users_file.write(f'{login}|{password}')
+		self.authorizer.write_login_password(login, password)
 
-		with open('../assets/user_status/logged_in.txt', 'w', encoding='utf-8') as status_file:
-			status_file.write('True')
+		self.authorizer.write_log_in()
 
 		print('[INFO] -> Получил данные пользователя')
 
@@ -135,6 +135,7 @@ class VoiceAssistant:
 
 	def exit(self):
 		print(Fore.YELLOW + '[INFO] -> Завершаю работу...')
+		self.authorizer.exit()
 		self.spider.exit()
 
 

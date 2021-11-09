@@ -23,6 +23,9 @@ class Authorizer:
             print(open(self.PASSWORD_FILEPATH).readline())
             return 'Error!'
 
+    def password_saved(self):
+        return open(self.LOGGED_IN_FILEPATH).readline()
+
     def write_log_in(self):
         with open(self.LOGGED_IN_FILEPATH, 'w') as f:
             f.write('True')

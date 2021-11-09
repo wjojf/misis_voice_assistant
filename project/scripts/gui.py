@@ -20,13 +20,12 @@ class LeoindGUI:
         self.admin_panel = AdminPanel()
         self.authorizer = Authorizer()
 
-        # FILEPATH
-        self.password_saved_filepath = '../assets/passwords/password_saved.txt'
+        
 
         # BOOLEAN FLAGS
         self.gui_done = False
         self.running = True
-        self.password_saved = open(self.password_saved_filepath).readline()
+        self.password_saved = self.authorizer.password_saved()
         print(self.password_saved)
 
 
@@ -82,6 +81,10 @@ class LeoindGUI:
         self.send_button.config(font=('Arial', 12))
         self.send_button.pack(padx=20, pady=5)
 
+        self.voice_button = tkinter.Button(self.win, text='Voice', command=self.handle_voice_input)
+        self.voice_button.config(font=('Arial', 12))
+        self.voice_button.pack(padx=20, pady=5)
+
         self.gui_done = True
 
         self.win.protocol('WM_DELETE_WINDOW', self.stop)
@@ -107,7 +110,7 @@ class LeoindGUI:
             func = self.recognizer.get_func(user_input)#if command understood 
             
             self.write_assistant_answer(func['answer']) # send answer to text area
-            sleep(2)
+            
 
             if func['func'] is not None:
                 
@@ -117,7 +120,31 @@ class LeoindGUI:
                 else:
                     eval(func['func'])
 
-    
+    def handle_voice_input(self):
+        '''
+        handle_keyboard_input func but voice input instead
+        '''
+        self.write_assistant_answer('Слушаю вашу команду! У вас три секунды')
+
+        user_input = self.speech_recognizer.take_command()
+        
+        if self.speech_recognizer.is_valid(user_input):
+            func = self.recognizer.get_func(user_input)#if command understood 
+            
+            self.write_assistant_answer(func['answer']) # send answer to text area
+            
+
+            if func['func'] is not None:
+                
+                if func['func'] in self.SPECIAL_FUNCS: #if funcs should be executed differently in cmd/gui version
+                    eval(self.SPECIAL_FUNCS[func['func']])
+                
+                else:
+                    eval(func['func'])
+
+        else:
+            self.write_assistant_answer('Я вас не понял:(')
+
     def take_user_input(self):
         return self.input_area.get('1.0', 'end').strip()
 

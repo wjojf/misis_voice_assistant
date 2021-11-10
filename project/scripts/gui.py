@@ -39,7 +39,9 @@ class LeoindGUI:
         # GET USER DATA
         if self.password_saved == 'False':
             msg = tkinter.Tk()
+            msg.eval('tk::PlaceWindow . center')
             msg.withdraw()
+
 
             self.login = simpledialog.askstring('Логин', 'Ваш логин(m1111111@edu.misis.ru)', parent=msg)
             self.password = simpledialog.askstring('Пароль', "Введите пароль", parent=msg)
@@ -124,26 +126,31 @@ class LeoindGUI:
         '''
         handle_keyboard_input func but voice input instead
         '''
-        self.write_assistant_answer('Слушаю вашу команду! У вас три секунды')
 
-        user_input = self.speech_recognizer.take_command()
+        if self.speech_recognizer.VOICE_ENABLED:
+            self.write_assistant_answer('Слушаю вашу команду! У вас три секунды')
+
+            user_input = self.speech_recognizer.take_command()
         
-        if self.speech_recognizer.is_valid(user_input):
-            func = self.recognizer.get_func(user_input)#if command understood 
+            if self.speech_recognizer.is_valid(user_input):
+                func = self.recognizer.get_func(user_input)#if command understood
             
-            self.write_assistant_answer(func['answer']) # send answer to text area
+                self.write_assistant_answer(func['answer']) # send answer to text area
             
 
-            if func['func'] is not None:
+                if func['func'] is not None:
                 
-                if func['func'] in self.SPECIAL_FUNCS: #if funcs should be executed differently in cmd/gui version
-                    eval(self.SPECIAL_FUNCS[func['func']])
+                    if func['func'] in self.SPECIAL_FUNCS: #if funcs should be executed differently in cmd/gui version
+                        eval(self.SPECIAL_FUNCS[func['func']])
                 
-                else:
-                    eval(func['func'])
+                    else:
+                        eval(func['func'])
+
+            else:
+                self.write_assistant_answer(self.speech_recognizer.ERROR_MESSAGES[user_input])
 
         else:
-            self.write_assistant_answer('Я вас не понял:(')
+            self.write_assistant_answer(self.speech_recognizer.ERROR_MESSAGES['mic_not_enabled_error'])
 
     def take_user_input(self):
         return self.input_area.get('1.0', 'end').strip()

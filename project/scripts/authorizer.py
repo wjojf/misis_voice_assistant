@@ -83,15 +83,18 @@ class Authorizer:
         msg.withdraw()
 
         save_password = simpledialog.askstring('Сохранить пароль?', "Сохранить пароль(y/n)?", parent=msg)
+        if save_password is not None:
+            if save_password.lower() in ['y', 'yes']:
+                return True
 
-        if save_password.lower() in ['y', 'yes']:
-            return True
+            elif save_password.lower() in ['n', 'no']:
 
-        elif save_password.lower() in ['n', 'no']:
+                return False
 
-            return False
+            self.ask_save_password_gui()
 
-        self.ask_save_password_gui()
+        else:
+            self.ask_save_password_gui()
 
     def exit_gui(self):
 

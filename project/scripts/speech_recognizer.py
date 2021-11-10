@@ -11,6 +11,12 @@ class SpeechRecognizer:
 			self.engine = pyttsx3.init()
 		except Exception as error:
 			print(error)
+		self.VOICE_ENABLED = True
+
+		self.ERROR_MESSAGES = {
+			'mic_not_enabled_error': "Не смог найти микрофон. Голосовой ввод недоступен",
+			'timeout_error': "время вышло, вы ничего не сказали"
+		}
 
 
 	def take_command(self):
@@ -21,18 +27,25 @@ class SpeechRecognizer:
 		try:
 			with sr.Microphone() as source:
 				print(Fore.YELLOW + 'Cлушаю команду...')
-				voice = self.listener.listen(source,10,3)
-				command = self.listener.recognize_google(voice, language='ru-RU')
-				
-				if command != '':
-					return command.lower()
-				
-				return 'error'
-		except:
-			return 'error'
+
+				try:
+					voice = self.listener.listen(source,10,3)
+					command = self.listener.recognize_google(voice, language='ru-RU')
+
+					if command != '':
+						return command.lower()
+
+					return 'error'
+				except sr.WaitTimeoutError:
+					return 'timeout_error'
+
+
+		except NotImplementedError or sr.UnknownValueError:#mic not avaliable
+			self.VOICE_ENABLED = False
+			return 'mic_not_enabled_error'
 
 	def is_valid(self, command):
-		return command != 'error'
+		return 'error' not in command
 
 	def say(self, command):
 		print(Fore.YELLOW + '[Леонид] {}'.format(command))

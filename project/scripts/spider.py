@@ -307,6 +307,19 @@ class WebSpider:
 				self._print('[Леонид] -> Вы не на платформе Canvas. Cкажите мне её открыть')
 
 
+	def show_marks_lms(self):
+
+		if self.logged_in:
+			if self.LMS_COURSE_URL in self.driver.current_url:
+				section_list = self.driver.find_element_by_id('section-tabs').find_elements_by_tag_name('li')
+
+				for action_element in section_list:
+					if action_element.text == 'Оценки':
+						action_element.click()
+						return
+			else:
+				self._print('[Леонид] -> Вы не на платформе Canvas. Cкажите мне её открыть')
+
 
 	def open_recordbook(self):
 		'''

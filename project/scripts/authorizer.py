@@ -82,19 +82,21 @@ class Authorizer:
         msg.eval('tk::PlaceWindow . center')
         msg.withdraw()
 
+        save_password = False # default value
         save_password = simpledialog.askstring('Сохранить пароль?', "Сохранить пароль(y/n)?", parent=msg)
-        if save_password is not None:
-            if save_password.lower() in ['y', 'yes']:
-                return True
 
-            elif save_password.lower() in ['n', 'no']:
+        if save_password.lower() in ['y', 'yes']:
+            return True
 
-                return False
-
-            self.ask_save_password_gui()
+        elif save_password.lower() in ['n', 'no']:
+            return False
 
         else:
-            self.ask_save_password_gui()
+            return False
+
+
+
+
 
     def exit_gui(self):
 
